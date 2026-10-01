@@ -1,0 +1,576 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Salem 1989: A Spectral Adventure</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+    }
+    body {
+      background-color: #0b0f0d;
+      font-family: 'Press Start 2P', monospace;
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+    }
+    #game-canvas {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+    .gb-border {
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.6), 0 12px 28px rgba(0,0,0,0.7);
+    }
+    .screen-overlay {
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+    }
+    .d-pad-btn {
+      touch-action: manipulation;
+      transition: all 0.08s ease;
+      background: radial-gradient(circle, #2d3748 0%, #1a202c 100%);
+    }
+    .d-pad-btn:active, .d-pad-btn.active-touch {
+      background: radial-gradient(circle, #4a5568 0%, #2d3748 100%);
+      transform: scale(0.92);
+    }
+    .action-btn {
+      touch-action: manipulation;
+      transition: all 0.08s ease;
+      background: radial-gradient(circle, #991b1b 0%, #7f1d1d 100%);
+      box-shadow: 0 4px 0 #450a0a, 0 6px 10px rgba(0,0,0,0.5);
+    }
+    .action-btn:active, .action-btn.active-touch {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #450a0a, 0 3px 5px rgba(0,0,0,0.4);
+    }
+  </style>
+</head>
+<body class="min-h-screen text-[#8bac0f] flex flex-col items-center justify-center p-2 sm:p-4 select-none">
+
+  <main class="w-full max-w-[480px] bg-[#c4cfa1] p-3 sm:p-5 rounded-3xl shadow-2xl border-4 border-[#9ba77b] flex flex-col items-center relative">
+    
+    <!-- Top Header Status -->
+    <header class="w-full flex justify-between items-center px-4 mb-2 text-[10px] text-[#5b6540] tracking-wider uppercase font-bold">
+      <div class="flex items-center gap-1.5">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse shadow-sm"></span>
+        <span>BATTERY</span>
+      </div>
+      <div class="tracking-widest font-extrabold text-[11px] text-[#434b2d]">SALEM-BOY COLOR</div>
+    </header>
+
+    <!-- Bezel & Canvas Display -->
+    <section class="relative w-full bg-[#8b956d] p-3 rounded-2xl border-2 border-[#768159] gb-border flex flex-col items-center">
+      <div class="relative w-full aspect-[10/9] max-h-[360px] bg-[#8bac0f] rounded-lg overflow-hidden border-4 border-[#1f240a] flex items-center justify-center shadow-inner">
+        <canvas id="game-canvas" width="160" height="144" class="w-full h-full block cursor-pointer"></canvas>
+        <div class="absolute inset-0 screen-overlay"></div>
+      </div>
+      <!-- Landmark Banner & Audio Toggle -->
+      <div class="w-full flex justify-between items-center mt-2 px-1 text-[9px] text-[#2c3315]">
+        <span id="landmark-tag" class="truncate font-bold tracking-tight">📍 ESSEX ST MALL</span>
+        <button id="audio-toggle" class="bg-[#9ba77b] text-[#1f240a] hover:bg-[#8bac0f] px-2 py-0.5 rounded text-[8px] border border-[#5b6540] font-bold">
+          AUDIO: OFF
+        </button>
+      </div>
+    </section>
+
+    <!-- Game Boy Controller Pad Controls -->
+    <section class="w-full mt-4 flex flex-row justify-between items-center px-3 sm:px-6">
+      <!-- Directional D-Pad -->
+      <div class="relative w-28 h-28 sm:w-32 sm:h-32 bg-[#2d3748] rounded-full p-2 shadow-inner border border-[#1a202c] flex items-center justify-center">
+        <button id="btn-up" class="d-pad-btn absolute top-1 w-9 h-9 sm:w-10 sm:h-10 rounded-t-md border-t-2 border-slate-600 flex items-center justify-center text-slate-400 font-bold text-xs" aria-label="Up">▲</button>
+        <button id="btn-left" class="d-pad-btn absolute left-1 w-9 h-9 sm:w-10 sm:h-10 rounded-l-md border-l-2 border-slate-600 flex items-center justify-center text-slate-400 font-bold text-xs" aria-label="Left">◀</button>
+        <div class="w-8 h-8 rounded bg-[#1a202c] flex items-center justify-center">
+          <div class="w-3 h-3 rounded-full bg-[#111827]"></div>
+        </div>
+        <button id="btn-right" class="d-pad-btn absolute right-1 w-9 h-9 sm:w-10 sm:h-10 rounded-r-md border-r-2 border-slate-600 flex items-center justify-center text-slate-400 font-bold text-xs" aria-label="Right">▶</button>
+        <button id="btn-down" class="d-pad-btn absolute bottom-1 w-9 h-9 sm:w-10 sm:h-10 rounded-b-md border-b-2 border-slate-600 flex items-center justify-center text-slate-400 font-bold text-xs" aria-label="Down">▼</button>
+      </div>
+
+      <!-- Action Buttons A & B -->
+      <div class="flex items-center gap-3 sm:gap-4 rotate-[-18deg] pb-2">
+        <div class="flex flex-col items-center">
+          <button id="btn-b" class="action-btn w-12 h-12 sm:w-14 sm:h-14 rounded-full text-white text-xs font-black flex items-center justify-center" aria-label="Button B">B</button>
+          <span class="text-[9px] font-bold text-[#450a0a] mt-1">CANCEL</span>
+        </div>
+        <div class="flex flex-col items-center -mt-6">
+          <button id="btn-a" class="action-btn w-12 h-12 sm:w-14 sm:h-14 rounded-full text-white text-xs font-black flex items-center justify-center" aria-label="Button A">A</button>
+          <span class="text-[9px] font-bold text-[#450a0a] mt-1">INTERACT</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Select / Start Row -->
+    <footer class="w-full flex justify-center gap-6 mt-4 pb-1">
+      <div class="flex flex-col items-center">
+        <button id="btn-select" class="w-12 h-3.5 bg-slate-600 rounded-full rotate-[-25deg] shadow border-t border-slate-400 active:bg-slate-800" aria-label="Select / Guide"></button>
+        <span class="text-[8px] font-bold text-[#4b5536] mt-2">SELECT</span>
+      </div>
+      <div class="flex flex-col items-center">
+        <button id="btn-start" class="w-12 h-3.5 bg-slate-600 rounded-full rotate-[-25deg] shadow border-t border-slate-400 active:bg-slate-800" aria-label="Start / Pack"></button>
+        <span class="text-[8px] font-bold text-[#4b5536] mt-2">START (BAG)</span>
+      </div>
+    </footer>
+
+    <div class="w-full text-center text-[7px] text-[#4b5536] mt-3 font-mono opacity-80">
+      KEYBOARD: [WASD / Arrows] Walk | [Z / J] A Button | [X / K] B Button | [ENTER] Bag
+    </div>
+  </main>
+
+  <script>
+  const SoundSystem = {
+    ctx: null,
+    enabled: false,
+
+    init() {
+      if (!this.ctx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AudioContext();
+      }
+      if (this.ctx.state === 'suspended') {
+        this.ctx.resume();
+      }
+      this.enabled = true;
+      const btn = document.getElementById('audio-toggle');
+      btn.innerText = "AUDIO: ON";
+      btn.classList.replace('bg-[#9ba77b]', 'bg-[#306230]');
+      btn.classList.add('text-white');
+    },
+
+    toggle() {
+      if (!this.enabled) {
+        this.init();
+        this.playBeep(440, 'triangle', 0.08);
+      } else {
+        this.enabled = false;
+        const btn = document.getElementById('audio-toggle');
+        btn.innerText = "AUDIO: OFF";
+        btn.classList.replace('bg-[#306230]', 'bg-[#9ba77b]');
+        btn.classList.remove('text-white');
+      }
+    },
+
+    playTone(freq, type = 'square', duration = 0.1, gainVal = 0.08) {
+      if (!this.enabled || !this.ctx) return;
+      try {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
+      } catch (e) {
+        console.error("Audio error", e);
+      }
+    },
+
+    playBeep(freq = 520, type = 'square', dur = 0.06) {
+      this.playTone(freq, type, dur, 0.05);
+    },
+
+    playStep() {
+      if (!this.enabled || !this.ctx) return;
+      this.playTone(85 + Math.random() * 25, 'triangle', 0.03, 0.02);
+    },
+
+    playSelect() {
+      this.playTone(680, 'square', 0.07, 0.06);
+    },
+
+    playEncounter() {
+      if (!this.enabled || !this.ctx) return;
+      const notes = [220, 277, 330, 440, 554, 659];
+      notes.forEach((f, i) => {
+        setTimeout(() => this.playTone(f, 'sawtooth', 0.1, 0.06), i * 50);
+      });
+    },
+
+    playWin() {
+      if (!this.enabled || !this.ctx) return;
+      const fanfare = [392, 523, 659, 784];
+      fanfare.forEach((f, i) => {
+        setTimeout(() => this.playTone(f, 'square', 0.14, 0.08), i * 85);
+      });
+    }
+  };
+
+  document.getElementById('audio-toggle').addEventListener('click', () => {
+    SoundSystem.toggle();
+  });
+
+  const PAL = {
+    L0: '#9bbc0f', // Lightest green
+    L1: '#8bac0f', // Light green
+    L2: '#306230', // Dark green
+    L3: '#0f380f'  // Deepest green/black
+  };
+
+  const canvas = document.getElementById('game-canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+
+  const TILE_SIZE = 16;
+  const WORLD_WIDTH = 32;
+  const WORLD_HEIGHT = 28;
+
+  const MAP_DATA = [];
+  for (let y = 0; y < WORLD_HEIGHT; y++) {
+    const row = [];
+    for (let x = 0; x < WORLD_WIDTH; x++) {
+      if (x === 0 || y === 0 || x === WORLD_WIDTH - 1 || y === WORLD_HEIGHT - 1) {
+        row.push(2); // boundary brick wall
+      } else if (y < 8 && x < 14) {
+        row.push(1); // Howard St Cemetery grass
+      } else if (x >= 16 && y >= 3 && y <= 16 && x <= 30) {
+        row.push(1); // Salem Common grass
+      } else {
+        row.push(0); // Cobblestone pedestrian ways
+      }
+    }
+    MAP_DATA.push(row);
+  }
+
+  // 1. Howard Street Cemetery setup
+  for (let x = 1; x <= 13; x++) MAP_DATA[7][x] = 6;
+  MAP_DATA[7][7] = 0; // gate
+  const graveLocs = [
+    [2,2],[4,2],[6,2],[9,2],[11,2],
+    [3,4],[5,4],[8,4],[10,4],[12,4],
+    [2,6],[5,6],[11,6]
+  ];
+  graveLocs.forEach(([gx, gy]) => MAP_DATA[gy][gx] = 5);
+
+  // 2. Old Town Hall
+  for (let ty = 10; ty <= 14; ty++) {
+    for (let tx = 6; tx <= 13; tx++) {
+      MAP_DATA[ty][tx] = 2;
+    }
+  }
+  MAP_DATA[14][9] = 8;
+  MAP_DATA[14][10] = 8;
+
+  // 3. Hawthorne Hotel
+  for (let ty = 18; ty <= 24; ty++) {
+    for (let tx = 19; tx <= 28; tx++) {
+      MAP_DATA[ty][tx] = 2;
+    }
+  }
+  MAP_DATA[18][23] = 8;
+  MAP_DATA[18][24] = 8;
+
+  // 4. Salem Common Gazebo
+  for (let gy = 8; gy <= 11; gy++) {
+    for (let gx = 22; gx <= 25; gx++) {
+      MAP_DATA[gy][gx] = 7;
+    }
+  }
+  MAP_DATA[10][23] = 0;
+  MAP_DATA[10][24] = 0;
+
+  // Trees and fountains
+  const trees = [
+    [17, 4], [29, 4], [17, 15], [29, 15], [20, 14], [27, 14],
+    [1, 16], [1, 20], [1, 25], [14, 18], [14, 23]
+  ];
+  trees.forEach(([tx, ty]) => {
+    if (ty < WORLD_HEIGHT && tx < WORLD_WIDTH) MAP_DATA[ty][tx] = 4;
+  });
+
+  MAP_DATA[19][7] = 3;
+  MAP_DATA[19][8] = 3;
+  MAP_DATA[20][7] = 3;
+  MAP_DATA[20][8] = 3;
+
+  const entities = [
+    {
+      id: 'giles',
+      name: 'Giles Corey',
+      title: 'Defiant Puritan Ghost',
+      x: 7,
+      y: 3,
+      faceDir: 'down',
+      type: 'ghost',
+      sprite: 'spirit',
+      dialogue: [
+        "GILES: ...MORE WEIGHT!",
+        "GILES: They piled granite upon me in 1692, yet here I stand, stubbornly lingering!",
+        "GILES: If you carry pure Salem Sea Salt, sprinkle it to ease my weary spectral spine!"
+      ],
+      appeased: false,
+      appeaseItem: 'Sea Salt',
+      happyText: "GILES: Ah... the mineral crunch of the Atlantic shore! My curse is soothed, wanderer!",
+      reward: 'Ancient Seal'
+    },
+    {
+      id: 'witch_essex',
+      name: 'Rowan the Witch',
+      title: 'Occult Practitioner',
+      x: 9,
+      y: 16,
+      faceDir: 'down',
+      type: 'npc',
+      sprite: 'witch',
+      dialogue: [
+        "ROWAN: Blessed be! Tourists think we all fly on brooms along Essex Mall.",
+        "ROWAN: I'm brewing a cleansing draught, but I need a fresh Cider Donut from the stall.",
+        "ROWAN: Can you spare one for a spell?"
+      ],
+      appeased: false,
+      appeaseItem: 'Cider Donut',
+      happyText: "ROWAN: Perfect! Cinnamon, nutmeg, and apple cider magic. Take this Cold Iron Amulet!",
+      reward: 'Iron Amulet'
+    },
+    {
+      id: 'tourist_tim',
+      name: 'Lost Tourist Tim',
+      title: 'Perplexed Sightseer',
+      x: 23,
+      y: 12,
+      faceDir: 'left',
+      type: 'npc',
+      sprite: 'tourist',
+      dialogue: [
+        "TIM: Which way to the historic houses?! My travel guide is soaked in clam chowder!",
+        "TIM: The spectral mist on the Common is getting thick! Are those actual cats speaking Latin?",
+        "TIM: I need some historical protection before nightfall!"
+      ],
+      appeased: false,
+      appeaseItem: 'Iron Amulet',
+      happyText: "TIM: Whoa, this iron pendant feels warm! I feel protected! Here, take my spare snack!",
+      reward: 'Cider Donut'
+    },
+    {
+      id: 'spectral_cat',
+      name: 'Pyewacket',
+      title: 'Familiar Feline Spirit',
+      x: 24,
+      y: 9,
+      faceDir: 'down',
+      type: 'ghost',
+      sprite: 'cat',
+      dialogue: [
+        "PYEWACKET: *Mroww...*",
+        "The black cat's emerald eyes shimmer with 300 years of historic gossip.",
+        "PYEWACKET: *Purrs softly as leaves float through its translucent tail.*"
+      ],
+      appeased: false,
+      appeaseItem: 'Ancient Seal',
+      happyText: "PYEWACKET: *The spirit cat rubs against your boots and bestows nine spectral lives!*",
+      reward: 'Salem Charm'
+    },
+    {
+      id: 'hawthorne_clerk',
+      name: 'Hotel Clerk',
+      title: 'Hawthorne Hotel Staff',
+      x: 24,
+      y: 17,
+      faceDir: 'up',
+      type: 'npc',
+      sprite: 'clerk',
+      dialogue: [
+        "CLERK: Welcome to the Hawthorne Hotel, established 1925.",
+        "CLERK: Room 325 is reported active tonight. Guests hearing phantom brass keys jangling.",
+        "CLERK: Take this pouch of sea-harvested salt just in case."
+      ],
+      appeased: false,
+      appeaseItem: null,
+      givesOnFirstTalk: 'Sea Salt',
+      happyText: "CLERK: Sleep with one eye open, guest!",
+      reward: 'Sea Salt'
+    }
+  ];
+
+  const player = {
+    x: 8,
+    y: 20,
+    dir: 'up',
+    frame: 0,
+    inventory: ['Cider Donut']
+  };
+
+  function getLandmarkName(px, py) {
+    if (py < 8 && px < 15) return "📍 HOWARD ST CEMETERY";
+    if (px >= 16 && px <= 30 && py <= 16) return "📍 SALEM COMMON";
+    if (px >= 18 && py >= 17) return "📍 HAWTHORNE HOTEL";
+    if (px >= 5 && px <= 14 && py >= 9 && py <= 15) return "📍 OLD TOWN HALL PLAZA";
+    return "📍 ESSEX ST PEDESTRIAN MALL";
+  }
+
+  let gameState = 'OVERWORLD';
+  let dialogQueue = [];
+  let dialogSpeaker = "";
+  let dialogCurrentText = "";
+
+  const battleState = {
+    target: null,
+    menuIndex: 0,
+    subState: 'ACTION_SELECT',
+    options: ['TALK', 'GIFT ITEM', 'CAST CHARM', 'FLEE'],
+    feedbackText: ""
+  };
+
+  let bagIndex = 0;
+
+  const tileCache = {};
+
+  function makeCanvas(w, h) {
+    const c = document.createElement('canvas');
+    c.width = w;
+    c.height = h;
+    const cx = c.getContext('2d');
+    cx.imageSmoothingEnabled = false;
+    return { c, cx };
+  }
+
+  function initTileSprites() {
+    // 0: Cobblestone
+    const { c: cobbleC, cx: cobbleX } = makeCanvas(16, 16);
+    cobbleX.fillStyle = PAL.L1;
+    cobbleX.fillRect(0, 0, 16, 16);
+    cobbleX.fillStyle = PAL.L0;
+    cobbleX.fillRect(1, 1, 6, 6);
+    cobbleX.fillRect(9, 1, 6, 6);
+    cobbleX.fillRect(5, 9, 6, 6);
+    cobbleX.fillStyle = PAL.L2;
+    cobbleX.fillRect(0, 7, 16, 1);
+    cobbleX.fillRect(0, 15, 16, 1);
+    cobbleX.fillRect(7, 0, 1, 7);
+    cobbleX.fillRect(4, 8, 1, 7);
+    cobbleX.fillRect(11, 8, 1, 7);
+    tileCache[0] = cobbleC;
+
+    // 1: Grass
+    const { c: grassC, cx: grassX } = makeCanvas(16, 16);
+    grassX.fillStyle = PAL.L1;
+    grassX.fillRect(0, 0, 16, 16);
+    grassX.fillStyle = PAL.L0;
+    grassX.fillRect(3, 4, 1, 3);
+    grassX.fillRect(4, 3, 1, 1);
+    grassX.fillRect(11, 10, 1, 3);
+    grassX.fillRect(12, 9, 1, 1);
+    grassX.fillStyle = PAL.L2;
+    grassX.fillRect(2, 6, 1, 1);
+    grassX.fillRect(10, 12, 1, 1);
+    tileCache[1] = grassC;
+
+    // 2: Brick Building Wall
+    const { c: brickC, cx: brickX } = makeCanvas(16, 16);
+    brickX.fillStyle = PAL.L3;
+    brickX.fillRect(0, 0, 16, 16);
+    brickX.fillStyle = PAL.L2;
+    for (let r = 0; r < 4; r++) {
+      const y = r * 4;
+      const off = (r % 2 === 0) ? 0 : 4;
+      brickX.fillRect(off + 1, y + 1, 6, 2);
+      brickX.fillRect(off + 9, y + 1, 6, 2);
+    }
+    tileCache[2] = brickC;
+
+    // 3: Fountain / Water
+    const { c: waterC, cx: waterX } = makeCanvas(16, 16);
+    waterX.fillStyle = PAL.L2;
+    waterX.fillRect(0, 0, 16, 16);
+    waterX.fillStyle = PAL.L1;
+    waterX.fillRect(2, 2, 12, 12);
+    waterX.fillStyle = PAL.L0;
+    waterX.fillRect(5, 5, 6, 6);
+    waterX.fillStyle = PAL.L3;
+    waterX.fillRect(7, 7, 2, 2);
+    tileCache[3] = waterC;
+
+    // 4: Historic Elm Tree
+    const { c: treeC, cx: treeX } = makeCanvas(16, 16);
+    treeX.fillStyle = PAL.L1;
+    treeX.fillRect(0, 0, 16, 16);
+    treeX.fillStyle = PAL.L3;
+    treeX.fillRect(3, 1, 10, 11);
+    treeX.fillRect(7, 11, 2, 5);
+    treeX.fillStyle = PAL.L2;
+    treeX.fillRect(4, 2, 8, 8);
+    treeX.fillStyle = PAL.L0;
+    treeX.fillRect(5, 3, 3, 3);
+    tileCache[4] = treeC;
+
+    // 5: Howard St Gravestone
+    const { c: graveC, cx: graveX } = makeCanvas(16, 16);
+    graveX.fillStyle = PAL.L1;
+    graveX.fillRect(0, 0, 16, 16);
+    graveX.fillStyle = PAL.L3;
+    graveX.fillRect(4, 2, 8, 12);
+    graveX.fillRect(5, 1, 6, 1);
+    graveX.fillStyle = PAL.L0;
+    graveX.fillRect(5, 3, 6, 9);
+    graveX.fillStyle = PAL.L3;
+    graveX.fillRect(7, 4, 2, 2);
+    graveX.fillRect(6, 8, 4, 1);
+    graveX.fillRect(7, 10, 2, 1);
+    tileCache[5] = graveC;
+
+    // 6: Wrought Iron Fence
+    const { c: fenceC, cx: fenceX } = makeCanvas(16, 16);
+    fenceX.fillStyle = PAL.L1;
+    fenceX.fillRect(0, 0, 16, 16);
+    fenceX.fillStyle = PAL.L3;
+    fenceX.fillRect(0, 7, 16, 2);
+    for (let p = 2; p < 16; p += 4) {
+      fenceX.fillRect(p, 2, 1, 14);
+      fenceX.fillRect(p - 1, 1, 3, 1);
+    }
+    tileCache[6] = fenceC;
+
+    // 7: Gazebo Structure
+    const { c: gazC, cx: gazX } = makeCanvas(16, 16);
+    gazX.fillStyle = PAL.L1;
+    gazX.fillRect(0, 0, 16, 16);
+    gazX.fillStyle = PAL.L3;
+    gazX.fillRect(1, 1, 14, 3);
+    gazX.fillRect(3, 4, 2, 12);
+    gazX.fillRect(11, 4, 2, 12);
+    gazX.fillStyle = PAL.L0;
+    gazX.fillRect(2, 2, 12, 1);
+    tileCache[7] = gazC;
+
+    // 8: Doorway
+    const { c: doorC, cx: doorX } = makeCanvas(16, 16);
+    doorX.fillStyle = PAL.L3;
+    doorX.fillRect(0, 0, 16, 16);
+    doorX.fillStyle = PAL.L2;
+    doorX.fillRect(2, 2, 12, 14);
+    doorX.fillStyle = PAL.L0;
+    doorX.fillRect(10, 9, 2, 2);
+    tileCache[8] = doorC;
+  }
+  initTileSprites();
+
+  function drawPlayerSprite(context, x, y, dir, frame) {
+    context.save();
+    context.translate(x, y);
+
+    context.fillStyle = PAL.L3;
+    context.fillRect(4, 1, 8, 4);
+    context.fillRect(3, 3, 10, 2);
+    if (dir === 'left') context.fillRect(1, 3, 3, 2);
+    if (dir === 'right') context.fillRect(12, 3, 3, 2);
+
+    context.fillStyle = PAL.L0;
+    context.fillRect(4, 5, 8, 4);
+
+    context.fillStyle = PAL.L3;
+    if (dir === 'down') {
+      context.fillRect(5, 6, 2, 2);
+      context.fillRect(9, 6, 2, 2);
+    } else if (dir ===
