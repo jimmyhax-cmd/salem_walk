@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Salem 1998</title>
+  <title>Salem 1998: Spirit Journey</title>
   <style>
     * {
       box-sizing: border-box;
@@ -149,6 +149,7 @@
     const ctx = canvas.getContext('2d');
     const hud = document.getElementById('hud');
 
+    // GB 4-Green Palette
     const C = {
       L0: '#9bbc0f', // Lightest
       L1: '#8bac0f', // Light
@@ -156,8 +157,63 @@
       L3: '#0f380f'  // Darkest
     };
 
-    // 10 wide by 7 tall playable area (16x16 tiles) + bottom 32px dialogue box
-    // Tile types: 0: Cobblestone, 1: Grass, 2: Water/Canal, 3: Brick Building, 4: Gravestone, 5: Tree
+    // Web Audio Synthesizer Engine
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSound(type) {
+      initAudio();
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      const now = audioCtx.currentTime;
+
+      if (type === 'step') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(120, now);
+        osc.frequency.exponentialRampToValueAtTime(40, now + 0.04);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.04);
+        osc.start(now);
+        osc.stop(now + 0.04);
+      } else if (type === 'select') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.setValueAtTime(880, now + 0.05);
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.1);
+        osc.start(now);
+        osc.stop(now + 0.1);
+      } else if (type === 'battle_start') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.linearRampToValueAtTime(600, now + 0.25);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } else if (type === 'hit') {
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(90, now);
+        osc.frequency.exponentialRampToValueAtTime(30, now + 0.1);
+        gain.gain.setValueAtTime(0.2, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.1);
+        osc.start(now);
+        osc.stop(now + 0.1);
+      }
+    }
+
+    // World Map (10 cols x 7 rows, 16x16 px)
+    // 0: Cobble, 1: Grass, 3: Brick, 4: Tombstone, 5: Tree
     const map = [
       [3, 3, 0, 0, 1, 1, 5, 1, 3, 3],
       [3, 3, 0, 0, 1, 5, 1, 1, 3, 3],
@@ -168,15 +224,49 @@
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     ];
 
+    // Game State
+    let mode = 'EXPLORE'; // 'EXPLORE' | 'BATTLE' | 'INVENTORY'
+    let player = { x: 4, y: 2, dir: 'down', step: 0, hp: 20, maxHp: 20 };
+    let inventory = ["Cider Donut", "Sea Salt", "Iron Amulet"];
+    let message = "Salem, Oct 1998. Explore!";
+    let battleMenuIdx = 0; // 0: Talk, 1: Ward, 2: Item, 3: Flee
+    let currentEnemy = null;
+
     const npcs = {
-      "1,4": { name: "Giles Corey", sprite: "ghost", text: "GILES: More weight! Keep pushing, traveler." },
-      "6,1": { name: "Juliette (Familiar)", sprite: "cat", text: "BEANS: *Purrs from the void and rubs ankles*" },
-      "8,3": { name: "Tour Tourist", sprite: "tourist", text: "TOURIST: Where is the Sanderson house?!" },
-      "4,4": { name: "Old Town Hall", sprite: "door", text: "HALL: The historic market stands silent." }
+      "1,4": { 
+        name: "Giles Corey", 
+        type: "GILES", 
+        hp: 30, 
+        maxHp: 30,
+        text: "GILES: More weight! Will you press or talk?",
+        sprite: "ghost" 
+      },
+      "6,1": { 
+        name: "Juliette", 
+        type: "CAT", 
+        hp: 15, 
+        maxHp: 15,
+        text: "BEANS: *Purrs loudly from the void*", 
+        sprite: "cat" 
+      },
+      "8,3": { 
+        name: "Essex Witch", 
+        type: "WITCH", 
+        hp: 25, 
+        maxHp: 25,
+        text: "WITCH: Stir the cauldron of memories!", 
+        sprite: "witch" 
+      }
     };
 
-    let player = { x: 4, y: 2, dir: 'down', step: 0 };
-    let message = "Welcome to Salem. Explore downtown!";
+    function startBattle(enemy) {
+      mode = 'BATTLE';
+      currentEnemy = { ...enemy };
+      battleMenuIdx = 0;
+      message = `Encountered ${currentEnemy.name}!`;
+      playSound('battle_start');
+      render();
+    }
 
     function drawMap() {
       for (let r = 0; r < 7; r++) {
@@ -185,22 +275,19 @@
           const px = c * 16;
           const py = r * 16;
 
-          if (t === 0) {
-            // Cobblestone
+          if (t === 0) { // Cobblestone
             ctx.fillStyle = C.L0;
             ctx.fillRect(px, py, 16, 16);
             ctx.fillStyle = C.L1;
             ctx.fillRect(px + 1, py + 1, 6, 6);
             ctx.fillRect(px + 9, py + 9, 6, 6);
-          } else if (t === 1) {
-            // Grass / Common
+          } else if (t === 1) { // Grass
             ctx.fillStyle = C.L1;
             ctx.fillRect(px, py, 16, 16);
             ctx.fillStyle = C.L2;
             ctx.fillRect(px + 4, py + 4, 2, 4);
             ctx.fillRect(px + 10, py + 8, 2, 3);
-          } else if (t === 3) {
-            // Brick Building
+          } else if (t === 3) { // Brick Building
             ctx.fillStyle = C.L3;
             ctx.fillRect(px, py, 16, 16);
             ctx.fillStyle = C.L2;
@@ -208,16 +295,14 @@
             ctx.fillStyle = C.L0;
             ctx.fillRect(px + 4, py + 5, 3, 4);
             ctx.fillRect(px + 9, py + 5, 3, 4);
-          } else if (t === 4) {
-            // Cemetery Tombstone
+          } else if (t === 4) { // Gravestone
             ctx.fillStyle = C.L1;
             ctx.fillRect(px, py, 16, 16);
             ctx.fillStyle = C.L3;
             ctx.fillRect(px + 4, py + 4, 8, 10);
             ctx.fillStyle = C.L2;
             ctx.fillRect(px + 5, py + 5, 6, 8);
-          } else if (t === 5) {
-            // Tree
+          } else if (t === 5) { // Tree
             ctx.fillStyle = C.L1;
             ctx.fillRect(px, py, 16, 16);
             ctx.fillStyle = C.L3;
@@ -229,7 +314,7 @@
     }
 
     function drawEntities() {
-      // Draw NPCs
+      // NPCs
       for (const [pos, npc] of Object.entries(npcs)) {
         const [nx, ny] = pos.split(',').map(Number);
         const ex = nx * 16;
@@ -247,20 +332,20 @@
           ctx.fillRect(ex + 3, ey + 4, 4, 4);
           ctx.fillStyle = C.L0;
           ctx.fillRect(ex + 4, ey + 5, 1, 1);
-        } else if (npc.sprite === 'tourist') {
+        } else if (npc.sprite === 'witch') {
+          ctx.fillStyle = C.L3;
+          ctx.fillRect(ex + 3, ey + 2, 10, 3);
+          ctx.fillRect(ex + 6, ey + 0, 4, 4);
           ctx.fillStyle = C.L2;
-          ctx.fillRect(ex + 4, ey + 4, 8, 9);
-          ctx.fillStyle = C.L0;
-          ctx.fillRect(ex + 5, ey + 2, 6, 4);
+          ctx.fillRect(ex + 4, ey + 5, 8, 9);
         }
       }
 
-      // Draw Player
+      // Player
       const px = player.x * 16;
       const py = player.y * 16;
 
       ctx.fillStyle = C.L3;
-      // Cap Brim
       if (player.dir === 'left') {
         ctx.fillRect(px + 2, py + 2, 6, 2);
       } else if (player.dir === 'right') {
@@ -269,15 +354,12 @@
         ctx.fillRect(px + 4, py + 2, 8, 2);
       }
 
-      // Head
       ctx.fillStyle = C.L0;
       ctx.fillRect(px + 5, py + 3, 6, 4);
 
-      // Torso / Jacket
       ctx.fillStyle = C.L3;
       ctx.fillRect(px + 4, py + 7, 8, 5);
 
-      // Legs / Walking Frame
       ctx.fillStyle = C.L2;
       if (player.step % 2 === 0) {
         ctx.fillRect(px + 4, py + 12, 3, 3);
@@ -289,7 +371,6 @@
     }
 
     function drawDialogue() {
-      // Bottom Box
       ctx.fillStyle = C.L3;
       ctx.fillRect(0, 112, 160, 32);
       ctx.fillStyle = C.L0;
@@ -297,30 +378,95 @@
       ctx.fillStyle = C.L3;
       ctx.font = '8px monospace';
 
-      // 2-line slice
       ctx.fillText(message.slice(0, 24), 6, 125);
       if (message.length > 24) {
         ctx.fillText(message.slice(24, 48), 6, 136);
       }
     }
 
-    function render() {
+    function drawBattleScreen() {
       ctx.fillStyle = C.L0;
       ctx.fillRect(0, 0, 160, 144);
-      drawMap();
-      drawEntities();
-      drawDialogue();
+
+      // Enemy HUD
+      ctx.fillStyle = C.L3;
+      ctx.font = '8px monospace';
+      ctx.fillText(currentEnemy.name.toUpperCase(), 10, 14);
+      ctx.fillText(`HP: ${currentEnemy.hp}/${currentEnemy.maxHp}`, 10, 24);
+      ctx.strokeRect(10, 26, 60, 4);
+      ctx.fillRect(10, 26, (currentEnemy.hp / currentEnemy.maxHp) * 60, 4);
+
+      // Enemy Sprite Box
+      ctx.fillStyle = C.L2;
+      ctx.fillRect(95, 10, 50, 40);
+      ctx.fillStyle = C.L0;
+      ctx.font = '9px monospace';
+      ctx.fillText(currentEnemy.sprite.toUpperCase(), 102, 34);
+
+      // Player Back-Sprite Box
+      ctx.fillStyle = C.L3;
+      ctx.fillRect(16, 60, 44, 44);
+      ctx.fillStyle = C.L0;
+      ctx.fillText("YOU", 28, 85);
+
+      // Player HUD
+      ctx.fillStyle = C.L3;
+      ctx.fillText("INVESTIGATOR", 80, 75);
+      ctx.fillText(`HP: ${player.hp}/${player.maxHp}`, 80, 85);
+      ctx.strokeRect(80, 88, 60, 4);
+      ctx.fillRect(80, 88, (player.hp / player.maxHp) * 60, 4);
+
+      // Battle Action Menu
+      ctx.fillStyle = C.L3;
+      ctx.fillRect(0, 106, 160, 38);
+      ctx.fillStyle = C.L0;
+      ctx.fillRect(2, 108, 156, 34);
+
+      ctx.fillStyle = C.L3;
+      ctx.font = '8px monospace';
+
+      const options = ["TALK", "WARD", "ITEM", "RUN"];
+      options.forEach((opt, idx) => {
+        const ox = (idx % 2 === 0) ? 18 : 88;
+        const oy = (idx < 2) ? 120 : 134;
+        if (battleMenuIdx === idx) {
+          ctx.fillText("▶ " + opt, ox - 10, oy);
+        } else {
+          ctx.fillText(opt, ox, oy);
+        }
+      });
+    }
+
+    function render() {
+      if (mode === 'EXPLORE') {
+        ctx.fillStyle = C.L0;
+        ctx.fillRect(0, 0, 160, 144);
+        drawMap();
+        drawEntities();
+        drawDialogue();
+      } else if (mode === 'BATTLE') {
+        drawBattleScreen();
+      }
     }
 
     function move(dx, dy, dirName) {
+      if (mode === 'BATTLE') {
+        if (dx !== 0) battleMenuIdx = (battleMenuIdx % 2 === 0) ? battleMenuIdx + 1 : battleMenuIdx - 1;
+        if (dy !== 0) battleMenuIdx = (battleMenuIdx < 2) ? battleMenuIdx + 2 : battleMenuIdx - 2;
+        battleMenuIdx = Math.max(0, Math.min(3, battleMenuIdx));
+        playSound('step');
+        render();
+        return;
+      }
+
       player.dir = dirName;
       player.step++;
+      playSound('step');
+
       const nx = player.x + dx;
       const ny = player.y + dy;
 
-      // Map bounds check
       if (nx >= 0 && nx < 10 && ny >= 0 && ny < 7) {
-        // Collision against buildings and trees
         const targetTile = map[ny][nx];
         if (targetTile !== 3 && targetTile !== 5) {
           player.x = nx;
@@ -328,7 +474,6 @@
         }
       }
 
-      // Zone identification
       if (player.x < 3 && player.y > 2) {
         hud.textContent = "HOWARD ST CEMETERY";
       } else if (player.x > 3 && player.y < 3) {
@@ -337,14 +482,76 @@
         hud.textContent = "ESSEX ST MALL";
       }
 
-      // Check standing in front of NPC
       const key = `${player.x},${player.y}`;
       if (npcs[key]) {
         message = npcs[key].text;
       } else {
-        message = `Roaming ${hud.textContent}...`;
+        message = `Exploring ${hud.textContent}...`;
       }
 
+      render();
+    }
+
+    function handleA() {
+      playSound('select');
+      if (mode === 'EXPLORE') {
+        let tx = player.x;
+        let ty = player.y;
+        if (player.dir === 'up') ty--;
+        if (player.dir === 'down') ty++;
+        if (player.dir === 'left') tx--;
+        if (player.dir === 'right') tx++;
+
+        const targetKey = `${tx},${ty}`;
+        if (npcs[targetKey]) {
+          startBattle(npcs[targetKey]);
+          return;
+        } else {
+          message = "Inspected: Cobblestone and chilly air.";
+        }
+      } else if (mode === 'BATTLE') {
+        if (battleMenuIdx === 0) { // TALK
+          message = `${currentEnemy.name} shared ancient Salem lore!`;
+          currentEnemy.hp = Math.max(0, currentEnemy.hp - 10);
+        } else if (battleMenuIdx === 1) { // WARD
+          playSound('hit');
+          message = `You held up Cold Iron! Spirit calms.`;
+          currentEnemy.hp = Math.max(0, currentEnemy.hp - 15);
+        } else if (battleMenuIdx === 2) { // ITEM
+          if (inventory.length > 0) {
+            const used = inventory.shift();
+            message = `Offered ${used}! Spirit smiles.`;
+            player.hp = Math.min(player.maxHp, player.hp + 10);
+            currentEnemy.hp = 0;
+          } else {
+            message = "No items left in pack!";
+          }
+        } else if (battleMenuIdx === 3) { // RUN
+          message = "Escaped back to Essex Street!";
+          mode = 'EXPLORE';
+          render();
+          return;
+        }
+
+        if (currentEnemy.hp <= 0) {
+          setTimeout(() => {
+            message = `${currentEnemy.name} is peaceful. Journey on!`;
+            mode = 'EXPLORE';
+            render();
+          }, 800);
+        }
+      }
+      render();
+    }
+
+    function handleB() {
+      playSound('select');
+      if (mode === 'BATTLE') {
+        mode = 'EXPLORE';
+        message = "Fled the encounter.";
+      } else {
+        message = `Pack: ${inventory.join(', ') || 'Empty'}`;
+      }
       render();
     }
 
@@ -359,38 +566,16 @@
     bind('btn-down', () => move(0, 1, 'down'));
     bind('btn-left', () => move(-1, 0, 'left'));
     bind('btn-right', () => move(1, 0, 'right'));
+    bind('btn-a', handleA);
+    bind('btn-b', handleB);
 
-    bind('btn-a', () => {
-      // Check adjacent tiles for interaction
-      let tx = player.x;
-      let ty = player.y;
-      if (player.dir === 'up') ty--;
-      if (player.dir === 'down') ty++;
-      if (player.dir === 'left') tx--;
-      if (player.dir === 'right') tx++;
-
-      const targetKey = `${tx},${ty}`;
-      if (npcs[targetKey]) {
-        message = npcs[targetKey].text;
-      } else {
-        message = "Inspected: Quiet brick and cobblestone.";
-      }
-      render();
-    });
-
-    bind('btn-b', () => {
-      message = "Ate a fresh cider donut. Energy restored!";
-      render();
-    });
-
-    // Keyboard support
     window.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowUp' || e.key === 'w') move(0, -1, 'up');
       if (e.key === 'ArrowDown' || e.key === 's') move(0, 1, 'down');
       if (e.key === 'ArrowLeft' || e.key === 'a') move(-1, 0, 'left');
       if (e.key === 'ArrowRight' || e.key === 'd') move(1, 0, 'right');
-      if (e.key === 'z') document.getElementById('btn-a').dispatchEvent(new Event('pointerdown'));
-      if (e.key === 'x') document.getElementById('btn-b').dispatchEvent(new Event('pointerdown'));
+      if (e.key === 'z') handleA();
+      if (e.key === 'x') handleB();
     });
 
     render();
