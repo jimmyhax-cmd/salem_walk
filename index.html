@@ -14,32 +14,32 @@
       touch-action: none;
     }
     body {
-      background: #1a1c1a;
+      background: #121312;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
+      justify-content: center;
+      min-height: 100dvh;
       font-family: monospace;
-      padding: 10px;
+      padding: 6px;
     }
     #gameboy {
-      background: #8b956d;
-      border: 4px solid #2f381e;
-      border-radius: 12px;
-      padding: 12px;
+      background: #879166;
+      border: 4px solid #232b14;
+      border-radius: 12px 12px 28px 12px;
+      padding: 10px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      box-shadow: 0 8px 0 #1b2011;
+      box-shadow: 0 6px 0 #141a0b;
       width: 100%;
-      max-width: 340px;
+      max-width: 320px;
     }
     #screen-housing {
-      background: #4a533a;
-      padding: 12px 12px 8px 12px;
+      background: #3e462d;
+      padding: 10px 10px 6px 10px;
       border-radius: 6px;
-      border: 3px solid #2b3121;
+      border: 3px solid #232b14;
       width: 100%;
       display: flex;
       flex-direction: column;
@@ -51,13 +51,13 @@
       image-rendering: pixelated;
       border: 3px solid #0f380f;
       width: 256px;
-      height: 240px;
+      height: 230px;
     }
     #hud {
       color: #9bbc0f;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: bold;
-      margin-top: 6px;
+      margin-top: 5px;
       text-transform: uppercase;
       letter-spacing: 1px;
       text-align: center;
@@ -67,22 +67,22 @@
       justify-content: space-between;
       align-items: center;
       width: 100%;
-      margin-top: 18px;
-      padding: 0 10px;
+      margin-top: 12px;
+      padding: 0 6px;
     }
     #dpad {
       display: grid;
-      grid-template-columns: repeat(3, 42px);
-      grid-template-rows: repeat(3, 42px);
+      grid-template-columns: repeat(3, 38px);
+      grid-template-rows: repeat(3, 38px);
       gap: 2px;
     }
     .d-btn {
-      background: #2f381e;
-      border: 2px solid #1b2011;
-      border-radius: 4px;
-      color: #8b956d;
+      background: #232b14;
+      border: 2px solid #141a0b;
+      border-radius: 3px;
+      color: #879166;
       font-weight: bold;
-      font-size: 18px;
+      font-size: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -92,27 +92,27 @@
     }
     #action-btns {
       display: flex;
-      gap: 12px;
-      transform: rotate(-15deg);
+      gap: 10px;
+      transform: rotate(-14deg);
     }
     .act-btn {
-      background: #6b2434;
+      background: #731e31;
       border: 2px solid #360f18;
       border-radius: 50%;
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       color: #f7b2c0;
       font-weight: bold;
-      font-size: 16px;
+      font-size: 15px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 0 #20080d;
+      box-shadow: 0 4px 0 #1b070c;
     }
     .act-btn:active {
       background: #40121d;
       transform: translateY(2px);
-      box-shadow: 0 2px 0 #20080d;
+      box-shadow: 0 2px 0 #1b070c;
     }
   </style>
 </head>
@@ -121,7 +121,7 @@
   <div id="gameboy">
     <div id="screen-housing">
       <canvas id="screen" width="160" height="144"></canvas>
-      <div id="hud">SALEM: ESSEX ST</div>
+      <div id="hud">SALEM: ESSEX MALL</div>
     </div>
 
     <div id="controls">
@@ -130,7 +130,7 @@
         <button class="d-btn" id="btn-up">▲</button>
         <div></div>
         <button class="d-btn" id="btn-left">◀</button>
-        <button class="d-btn" id="btn-mid" style="background:#3b4625;">●</button>
+        <button class="d-btn" id="btn-mid" style="background:#2d371a;">●</button>
         <button class="d-btn" id="btn-right">▶</button>
         <div></div>
         <button class="d-btn" id="btn-down">▼</button>
@@ -149,145 +149,241 @@
     const ctx = canvas.getContext('2d');
     const hud = document.getElementById('hud');
 
-    // Palette: Classic GB 4-Green
     const C = {
-      LIGHTEST: '#9bbc0f',
-      LIGHT: '#8bac0f',
-      DARK: '#306230',
-      DARKEST: '#0f380f'
+      L0: '#9bbc0f', // Lightest
+      L1: '#8bac0f', // Light
+      L2: '#306230', // Dark
+      L3: '#0f380f'  // Darkest
     };
 
-    // State
-    let player = { x: 5, y: 4, dir: 'down', anim: 0 };
-    let message = "Welcome to Salem. Tap D-Pad to move!";
-    
-    // Landmarks on a 10x9 grid
-    const landmarks = {
-      "2,2": "Old Town Hall (1816)",
-      "7,2": "Hawthorne Hotel",
-      "5,2": "Salem Common Gazebo",
-      "2,6": "Howard St Cemetery",
-      "7,6": "Essex St Pedestrian Mall"
+    // 10 wide by 7 tall playable area (16x16 tiles) + bottom 32px dialogue box
+    // Tile types: 0: Cobblestone, 1: Grass, 2: Water/Canal, 3: Brick Building, 4: Gravestone, 5: Tree
+    const map = [
+      [3, 3, 0, 0, 1, 1, 5, 1, 3, 3],
+      [3, 3, 0, 0, 1, 5, 1, 1, 3, 3],
+      [0, 0, 0, 0, 1, 1, 1, 1, 0, 0],
+      [4, 4, 0, 0, 0, 0, 0, 0, 0, 0],
+      [4, 4, 0, 0, 3, 3, 0, 0, 3, 3],
+      [0, 0, 0, 0, 3, 3, 0, 0, 3, 3],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ];
+
+    const npcs = {
+      "1,4": { name: "Giles Corey", sprite: "ghost", text: "GILES: More weight! Keep pushing, traveler." },
+      "6,1": { name: "Juliette (Familiar)", sprite: "cat", text: "BEANS: *Purrs from the void and rubs ankles*" },
+      "8,3": { name: "Tour Tourist", sprite: "tourist", text: "TOURIST: Where is the Sanderson house?!" },
+      "4,4": { name: "Old Town Hall", sprite: "door", text: "HALL: The historic market stands silent." }
     };
 
-    function draw() {
-      // Clear background
-      ctx.fillStyle = C.LIGHTEST;
-      ctx.fillRect(0, 0, 160, 144);
+    let player = { x: 4, y: 2, dir: 'down', step: 0 };
+    let message = "Welcome to Salem. Explore downtown!";
 
-      // Cobblestone / path grid
-      ctx.fillStyle = C.LIGHT;
-      for (let x = 0; x < 10; x++) {
-        for (let y = 0; y < 9; y++) {
-          if ((x + y) % 2 === 0) {
-            ctx.fillRect(x * 16, y * 16, 16, 16);
+    function drawMap() {
+      for (let r = 0; r < 7; r++) {
+        for (let c = 0; c < 10; c++) {
+          const t = map[r][c];
+          const px = c * 16;
+          const py = r * 16;
+
+          if (t === 0) {
+            // Cobblestone
+            ctx.fillStyle = C.L0;
+            ctx.fillRect(px, py, 16, 16);
+            ctx.fillStyle = C.L1;
+            ctx.fillRect(px + 1, py + 1, 6, 6);
+            ctx.fillRect(px + 9, py + 9, 6, 6);
+          } else if (t === 1) {
+            // Grass / Common
+            ctx.fillStyle = C.L1;
+            ctx.fillRect(px, py, 16, 16);
+            ctx.fillStyle = C.L2;
+            ctx.fillRect(px + 4, py + 4, 2, 4);
+            ctx.fillRect(px + 10, py + 8, 2, 3);
+          } else if (t === 3) {
+            // Brick Building
+            ctx.fillStyle = C.L3;
+            ctx.fillRect(px, py, 16, 16);
+            ctx.fillStyle = C.L2;
+            ctx.fillRect(px + 2, py + 2, 12, 12);
+            ctx.fillStyle = C.L0;
+            ctx.fillRect(px + 4, py + 5, 3, 4);
+            ctx.fillRect(px + 9, py + 5, 3, 4);
+          } else if (t === 4) {
+            // Cemetery Tombstone
+            ctx.fillStyle = C.L1;
+            ctx.fillRect(px, py, 16, 16);
+            ctx.fillStyle = C.L3;
+            ctx.fillRect(px + 4, py + 4, 8, 10);
+            ctx.fillStyle = C.L2;
+            ctx.fillRect(px + 5, py + 5, 6, 8);
+          } else if (t === 5) {
+            // Tree
+            ctx.fillStyle = C.L1;
+            ctx.fillRect(px, py, 16, 16);
+            ctx.fillStyle = C.L3;
+            ctx.fillRect(px + 3, py + 2, 10, 8);
+            ctx.fillRect(px + 7, py + 10, 2, 5);
           }
         }
       }
+    }
 
-      // Draw Landmarks
-      for (const [pos, name] of Object.entries(landmarks)) {
-        const [lx, ly] = pos.split(',').map(Number);
-        ctx.fillStyle = C.DARKEST;
-        ctx.fillRect(lx * 16 + 2, ly * 16 + 2, 12, 12);
-        ctx.fillStyle = C.LIGHTEST;
-        ctx.fillRect(lx * 16 + 4, ly * 16 + 4, 8, 8);
+    function drawEntities() {
+      // Draw NPCs
+      for (const [pos, npc] of Object.entries(npcs)) {
+        const [nx, ny] = pos.split(',').map(Number);
+        const ex = nx * 16;
+        const ey = ny * 16;
+
+        if (npc.sprite === 'ghost') {
+          ctx.fillStyle = C.L0;
+          ctx.fillRect(ex + 4, ey + 2, 8, 10);
+          ctx.fillStyle = C.L3;
+          ctx.fillRect(ex + 6, ey + 4, 2, 2);
+          ctx.fillRect(ex + 9, ey + 4, 2, 2);
+        } else if (npc.sprite === 'cat') {
+          ctx.fillStyle = C.L3;
+          ctx.fillRect(ex + 4, ey + 6, 8, 6);
+          ctx.fillRect(ex + 3, ey + 4, 4, 4);
+          ctx.fillStyle = C.L0;
+          ctx.fillRect(ex + 4, ey + 5, 1, 1);
+        } else if (npc.sprite === 'tourist') {
+          ctx.fillStyle = C.L2;
+          ctx.fillRect(ex + 4, ey + 4, 8, 9);
+          ctx.fillStyle = C.L0;
+          ctx.fillRect(ex + 5, ey + 2, 6, 4);
+        }
       }
 
-      // Draw Player (Flat-Brim Cap & Jacket Sprite)
+      // Draw Player
       const px = player.x * 16;
       const py = player.y * 16;
 
-      // Shadow
-      ctx.fillStyle = C.DARK;
-      ctx.fillRect(px + 3, py + 13, 10, 3);
-
-      // Body / Jacket
-      ctx.fillStyle = C.DARKEST;
-      ctx.fillRect(px + 4, py + 6, 8, 7);
-
-      // Head
-      ctx.fillStyle = C.LIGHTEST;
-      ctx.fillRect(px + 5, py + 3, 6, 5);
-
-      // Hat Brim
-      ctx.fillStyle = C.DARKEST;
+      ctx.fillStyle = C.L3;
+      // Cap Brim
       if (player.dir === 'left') {
-        ctx.fillRect(px + 2, py + 2, 7, 2);
+        ctx.fillRect(px + 2, py + 2, 6, 2);
       } else if (player.dir === 'right') {
-        ctx.fillRect(px + 7, py + 2, 7, 2);
+        ctx.fillRect(px + 8, py + 2, 6, 2);
       } else {
         ctx.fillRect(px + 4, py + 2, 8, 2);
       }
 
-      // Message Box at bottom
-      ctx.fillStyle = C.DARKEST;
-      ctx.fillRect(0, 114, 160, 30);
-      ctx.fillStyle = C.LIGHTEST;
-      ctx.fillRect(2, 116, 156, 26);
-      ctx.fillStyle = C.DARKEST;
-      ctx.font = '8px monospace';
-      
-      // Auto-wrap text inside dialogue box
-      ctx.fillText(message.slice(0, 24), 6, 127);
-      if (message.length > 24) {
-        ctx.fillText(message.slice(24, 48), 6, 137);
+      // Head
+      ctx.fillStyle = C.L0;
+      ctx.fillRect(px + 5, py + 3, 6, 4);
+
+      // Torso / Jacket
+      ctx.fillStyle = C.L3;
+      ctx.fillRect(px + 4, py + 7, 8, 5);
+
+      // Legs / Walking Frame
+      ctx.fillStyle = C.L2;
+      if (player.step % 2 === 0) {
+        ctx.fillRect(px + 4, py + 12, 3, 3);
+        ctx.fillRect(px + 9, py + 12, 3, 3);
+      } else {
+        ctx.fillRect(px + 5, py + 12, 2, 3);
+        ctx.fillRect(px + 8, py + 12, 2, 3);
       }
+    }
+
+    function drawDialogue() {
+      // Bottom Box
+      ctx.fillStyle = C.L3;
+      ctx.fillRect(0, 112, 160, 32);
+      ctx.fillStyle = C.L0;
+      ctx.fillRect(2, 114, 156, 28);
+      ctx.fillStyle = C.L3;
+      ctx.font = '8px monospace';
+
+      // 2-line slice
+      ctx.fillText(message.slice(0, 24), 6, 125);
+      if (message.length > 24) {
+        ctx.fillText(message.slice(24, 48), 6, 136);
+      }
+    }
+
+    function render() {
+      ctx.fillStyle = C.L0;
+      ctx.fillRect(0, 0, 160, 144);
+      drawMap();
+      drawEntities();
+      drawDialogue();
     }
 
     function move(dx, dy, dirName) {
       player.dir = dirName;
+      player.step++;
       const nx = player.x + dx;
       const ny = player.y + dy;
 
+      // Map bounds check
       if (nx >= 0 && nx < 10 && ny >= 0 && ny < 7) {
-        player.x = nx;
-        player.y = ny;
+        // Collision against buildings and trees
+        const targetTile = map[ny][nx];
+        if (targetTile !== 3 && targetTile !== 5) {
+          player.x = nx;
+          player.y = ny;
+        }
       }
 
-      // Check Landmark Collision
-      const key = `${player.x},${player.y}`;
-      if (landmarks[key]) {
-        message = `FOUND: ${landmarks[key]}`;
-        hud.textContent = landmarks[key];
+      // Zone identification
+      if (player.x < 3 && player.y > 2) {
+        hud.textContent = "HOWARD ST CEMETERY";
+      } else if (player.x > 3 && player.y < 3) {
+        hud.textContent = "SALEM COMMON";
       } else {
-        message = `Roaming Essex St (${player.x},${player.y})`;
-        hud.textContent = "SALEM: ESSEX ST";
+        hud.textContent = "ESSEX ST MALL";
       }
 
-      draw();
+      // Check standing in front of NPC
+      const key = `${player.x},${player.y}`;
+      if (npcs[key]) {
+        message = npcs[key].text;
+      } else {
+        message = `Roaming ${hud.textContent}...`;
+      }
+
+      render();
     }
 
-    // Direct Pointer Listeners (Bypasses Mobile Scrolling and Click Latency)
-    const bindBtn = (id, action) => {
-      const el = document.getElementById(id);
-      el.addEventListener('pointerdown', (e) => {
+    const bind = (id, fn) => {
+      document.getElementById(id).addEventListener('pointerdown', (e) => {
         e.preventDefault();
-        action();
+        fn();
       });
     };
 
-    bindBtn('btn-up', () => move(0, -1, 'up'));
-    bindBtn('btn-down', () => move(0, 1, 'down'));
-    bindBtn('btn-left', () => move(-1, 0, 'left'));
-    bindBtn('btn-right', () => move(1, 0, 'right'));
+    bind('btn-up', () => move(0, -1, 'up'));
+    bind('btn-down', () => move(0, 1, 'down'));
+    bind('btn-left', () => move(-1, 0, 'left'));
+    bind('btn-right', () => move(1, 0, 'right'));
 
-    bindBtn('btn-a', () => {
-      const key = `${player.x},${player.y}`;
-      if (landmarks[key]) {
-        message = `* Inspected: ${landmarks[key]} *`;
+    bind('btn-a', () => {
+      // Check adjacent tiles for interaction
+      let tx = player.x;
+      let ty = player.y;
+      if (player.dir === 'up') ty--;
+      if (player.dir === 'down') ty++;
+      if (player.dir === 'left') tx--;
+      if (player.dir === 'right') tx++;
+
+      const targetKey = `${tx},${ty}`;
+      if (npcs[targetKey]) {
+        message = npcs[targetKey].text;
       } else {
-        message = "Nothing here but cobblestone.";
+        message = "Inspected: Quiet brick and cobblestone.";
       }
-      draw();
+      render();
     });
 
-    bindBtn('btn-b', () => {
-      message = "You took a bite of a cider donut.";
-      draw();
+    bind('btn-b', () => {
+      message = "Ate a fresh cider donut. Energy restored!";
+      render();
     });
 
-    // Keyboard support for desktop fallback
+    // Keyboard support
     window.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowUp' || e.key === 'w') move(0, -1, 'up');
       if (e.key === 'ArrowDown' || e.key === 's') move(0, 1, 'down');
@@ -297,8 +393,7 @@
       if (e.key === 'x') document.getElementById('btn-b').dispatchEvent(new Event('pointerdown'));
     });
 
-    // Initial render
-    draw();
+    render();
   </script>
 </body>
 </html>
