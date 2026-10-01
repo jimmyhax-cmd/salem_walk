@@ -149,23 +149,49 @@
     const ctx = canvas.getContext('2d');
     const hud = document.getElementById('hud');
 
-    // GB 4-Green Palette
     const C = {
-      L0: '#9bbc0f', // Lightest
-      L1: '#8bac0f', // Light
-      L2: '#306230', // Dark
-      L3: '#0f380f'  // Darkest
+      L0: '#9bbc0f', // Lightest Green
+      L1: '#8bac0f', // Light Green
+      L2: '#306230', // Dark Green
+      L3: '#0f380f'  // Deep Dark
     };
 
-    // Web Audio Synthesizer Engine
+    // Synthesizer Engine (Sound Effects & Chiptune BGM)
     let audioCtx = null;
+    let bgmStep = 0;
+    let bgmInterval = null;
+    const bgmNotes = [220, 261, 329, 293, 220, 261, 392, 349]; // Minor town arpeggio
+
     function initAudio() {
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        startBGM();
       }
       if (audioCtx.state === 'suspended') {
         audioCtx.resume();
       }
+    }
+
+    function startBGM() {
+      if (bgmInterval) return;
+      bgmInterval = setInterval(() => {
+        if (!audioCtx || mode === 'BATTLE') return;
+        const note = bgmNotes[bgmStep % bgmNotes.length];
+        bgmStep++;
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(note, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.18);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.18);
+      }, 260);
     }
 
     function playSound(type) {
@@ -179,99 +205,131 @@
 
       if (type === 'step') {
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(120, now);
-        osc.frequency.exponentialRampToValueAtTime(40, now + 0.04);
-        gain.gain.setValueAtTime(0.08, now);
-        gain.gain.linearRampToValueAtTime(0, now + 0.04);
+        osc.frequency.setValueAtTime(110, now);
+        osc.frequency.exponentialRampToValueAtTime(40, now + 0.03);
+        gain.gain.setValueAtTime(0.04, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.03);
         osc.start(now);
-        osc.stop(now + 0.04);
+        osc.stop(now + 0.03);
       } else if (type === 'select') {
         osc.type = 'square';
         osc.frequency.setValueAtTime(440, now);
-        osc.frequency.setValueAtTime(880, now + 0.05);
-        gain.gain.setValueAtTime(0.1, now);
-        gain.gain.linearRampToValueAtTime(0, now + 0.1);
+        osc.frequency.setValueAtTime(880, now + 0.04);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.08);
         osc.start(now);
-        osc.stop(now + 0.1);
+        osc.stop(now + 0.08);
       } else if (type === 'battle_start') {
         osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(150, now);
-        osc.frequency.linearRampToValueAtTime(600, now + 0.25);
-        gain.gain.setValueAtTime(0.15, now);
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.linearRampToValueAtTime(560, now + 0.22);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.linearRampToValueAtTime(0, now + 0.22);
+        osc.start(now);
+        osc.stop(now + 0.22);
+      } else if (type === 'pacify') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523, now);
+        osc.frequency.setValueAtTime(659, now + 0.08);
+        osc.frequency.setValueAtTime(783, now + 0.16);
+        gain.gain.setValueAtTime(0.1, now);
         gain.gain.linearRampToValueAtTime(0, now + 0.25);
         osc.start(now);
         osc.stop(now + 0.25);
-      } else if (type === 'hit') {
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(90, now);
-        osc.frequency.exponentialRampToValueAtTime(30, now + 0.1);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.linearRampToValueAtTime(0, now + 0.1);
-        osc.start(now);
-        osc.stop(now + 0.1);
       }
     }
 
-    // World Map (10 cols x 7 rows, 16x16 px)
-    // 0: Cobble, 1: Grass, 3: Brick, 4: Tombstone, 5: Tree
-    const map = [
-      [3, 3, 0, 0, 1, 1, 5, 1, 3, 3],
-      [3, 3, 0, 0, 1, 5, 1, 1, 3, 3],
-      [0, 0, 0, 0, 1, 1, 1, 1, 0, 0],
-      [4, 4, 0, 0, 0, 0, 0, 0, 0, 0],
-      [4, 4, 0, 0, 3, 3, 0, 0, 3, 3],
-      [0, 0, 0, 0, 3, 3, 0, 0, 3, 3],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    ];
+    // World Maps: 0=Downtown, 1=Waterfront
+    // Tiles: 0:Cobble, 1:Grass, 2:Water, 3:Brick, 4:Gravestone, 5:Tree, 6:Dock Plank
+    const maps = {
+      downtown: [
+        [3, 3, 0, 0, 1, 1, 5, 1, 3, 3],
+        [3, 3, 0, 0, 1, 5, 1, 1, 3, 3],
+        [0, 0, 0, 0, 1, 1, 1, 1, 0, 0],
+        [4, 4, 0, 0, 0, 0, 0, 0, 0, 0],
+        [4, 4, 0, 0, 3, 3, 0, 0, 3, 3],
+        [0, 0, 0, 0, 3, 3, 0, 0, 3, 3],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      ],
+      waterfront: [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
+        [6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
+        [2, 2, 6, 6, 2, 2, 2, 2, 2, 2],
+        [2, 2, 6, 6, 2, 2, 2, 2, 2, 2],
+        [2, 2, 6, 6, 2, 2, 2, 2, 2, 2],
+        [2, 2, 3, 3, 2, 2, 2, 2, 2, 2] // Lighthouse node at bottom
+      ]
+    };
 
-    // Game State
+    // State & Persistent Storage
+    let currentZone = localStorage.getItem('salem_zone') || 'downtown';
+    let savedPlayer = JSON.parse(localStorage.getItem('salem_player') || 'null');
+    let player = savedPlayer || { x: 4, y: 2, dir: 'down', step: 0, hp: 20, maxHp: 20 };
+    let inventory = JSON.parse(localStorage.getItem('salem_inv') || 'null') || ["Cider Donut", "Sea Salt", "Iron Amulet"];
+    
     let mode = 'EXPLORE'; // 'EXPLORE' | 'BATTLE' | 'INVENTORY'
-    let player = { x: 4, y: 2, dir: 'down', step: 0, hp: 20, maxHp: 20 };
-    let inventory = ["Cider Donut", "Sea Salt", "Iron Amulet"];
     let message = "Salem, Oct 1998. Explore!";
-    let battleMenuIdx = 0; // 0: Talk, 1: Ward, 2: Item, 3: Flee
+    let battleMenuIdx = 0;
     let currentEnemy = null;
+    let activeNpcKey = null;
 
     const npcs = {
-      "1,4": { 
-        name: "Giles Corey", 
-        type: "GILES", 
-        hp: 30, 
-        maxHp: 30,
-        text: "GILES: More weight! Will you press or talk?",
-        sprite: "ghost" 
+      downtown: {
+        "1,4": { 
+          name: "Giles Corey", 
+          hp: 30, maxHp: 30, 
+          text: "GILES: More weight! Can you appease me?", 
+          sprite: "ghost",
+          reward: "Stone Shard"
+        },
+        "6,1": { 
+          name: "Juliette", 
+          hp: 15, maxHp: 15, 
+          text: "BEANS: *Purrs from the void and stretches*", 
+          sprite: "cat",
+          reward: "Void Whisker"
+        },
+        "8,3": { 
+          name: "Essex Witch", 
+          hp: 25, maxHp: 25, 
+          text: "WITCH: The veil thins on Essex Street.", 
+          sprite: "witch",
+          reward: "Broom Twig"
+        }
       },
-      "6,1": { 
-        name: "Juliette", 
-        type: "CAT", 
-        hp: 15, 
-        maxHp: 15,
-        text: "BEANS: *Purrs loudly from the void*", 
-        sprite: "cat" 
-      },
-      "8,3": { 
-        name: "Essex Witch", 
-        type: "WITCH", 
-        hp: 25, 
-        maxHp: 25,
-        text: "WITCH: Stir the cauldron of memories!", 
-        sprite: "witch" 
+      waterfront: {
+        "3,5": {
+          name: "Derby Ghost",
+          hp: 25, maxHp: 25,
+          text: "HAWTHORNE: The Custom House ledger is missing!",
+          sprite: "ghost",
+          reward: "Quill Pen"
+        }
       }
     };
 
-    function startBattle(enemy) {
+    function saveState() {
+      localStorage.setItem('salem_zone', currentZone);
+      localStorage.setItem('salem_player', JSON.stringify({ x: player.x, y: player.y, dir: player.dir, hp: player.hp, maxHp: player.maxHp }));
+      localStorage.setItem('salem_inv', JSON.stringify(inventory));
+    }
+
+    function startBattle(enemy, key) {
       mode = 'BATTLE';
+      activeNpcKey = key;
       currentEnemy = { ...enemy };
       battleMenuIdx = 0;
-      message = `Encountered ${currentEnemy.name}!`;
+      message = `Spotted ${currentEnemy.name}!`;
       playSound('battle_start');
       render();
     }
 
     function drawMap() {
+      const activeGrid = maps[currentZone];
       for (let r = 0; r < 7; r++) {
         for (let c = 0; c < 10; c++) {
-          const t = map[r][c];
+          const t = activeGrid[r][c];
           const px = c * 16;
           const py = r * 16;
 
@@ -287,14 +345,18 @@
             ctx.fillStyle = C.L2;
             ctx.fillRect(px + 4, py + 4, 2, 4);
             ctx.fillRect(px + 10, py + 8, 2, 3);
-          } else if (t === 3) { // Brick Building
+          } else if (t === 2) { // Ocean / Water
+            ctx.fillStyle = C.L3;
+            ctx.fillRect(px, py, 16, 16);
+            ctx.fillStyle = C.L2;
+            ctx.fillRect(px + 2, py + (player.step % 2 ? 4 : 6), 12, 2);
+          } else if (t === 3) { // Brick Building / Lighthouse
             ctx.fillStyle = C.L3;
             ctx.fillRect(px, py, 16, 16);
             ctx.fillStyle = C.L2;
             ctx.fillRect(px + 2, py + 2, 12, 12);
             ctx.fillStyle = C.L0;
-            ctx.fillRect(px + 4, py + 5, 3, 4);
-            ctx.fillRect(px + 9, py + 5, 3, 4);
+            ctx.fillRect(px + 5, py + 4, 6, 4);
           } else if (t === 4) { // Gravestone
             ctx.fillStyle = C.L1;
             ctx.fillRect(px, py, 16, 16);
@@ -308,14 +370,20 @@
             ctx.fillStyle = C.L3;
             ctx.fillRect(px + 3, py + 2, 10, 8);
             ctx.fillRect(px + 7, py + 10, 2, 5);
+          } else if (t === 6) { // Wharf Planks
+            ctx.fillStyle = C.L1;
+            ctx.fillRect(px, py, 16, 16);
+            ctx.fillStyle = C.L2;
+            ctx.fillRect(px, py + 15, 16, 1);
+            ctx.fillRect(px + 3, py + 4, 10, 1);
           }
         }
       }
     }
 
     function drawEntities() {
-      // NPCs
-      for (const [pos, npc] of Object.entries(npcs)) {
+      const zoneNpcs = npcs[currentZone] || {};
+      for (const [pos, npc] of Object.entries(zoneNpcs)) {
         const [nx, ny] = pos.split(',').map(Number);
         const ex = nx * 16;
         const ey = ny * 16;
@@ -392,7 +460,7 @@
       ctx.fillStyle = C.L3;
       ctx.font = '8px monospace';
       ctx.fillText(currentEnemy.name.toUpperCase(), 10, 14);
-      ctx.fillText(`HP: ${currentEnemy.hp}/${currentEnemy.maxHp}`, 10, 24);
+      ctx.fillText(`AGRO: ${currentEnemy.hp}/${currentEnemy.maxHp}`, 10, 24);
       ctx.strokeRect(10, 26, 60, 4);
       ctx.fillRect(10, 26, (currentEnemy.hp / currentEnemy.maxHp) * 60, 4);
 
@@ -466,27 +534,56 @@
       const nx = player.x + dx;
       const ny = player.y + dy;
 
+      // Screen transition between Downtown and Waterfront
+      if (ny >= 7 && currentZone === 'downtown') {
+        currentZone = 'waterfront';
+        player.y = 0;
+        message = "Walked south to Derby Wharf!";
+        hud.textContent = "DERBY WHARF WATERFRONT";
+        saveState();
+        render();
+        return;
+      } else if (ny < 0 && currentZone === 'waterfront') {
+        currentZone = 'downtown';
+        player.y = 6;
+        message = "Walked north to Essex Street!";
+        hud.textContent = "ESSEX ST MALL";
+        saveState();
+        render();
+        return;
+      }
+
+      // Standard grid boundary checks
       if (nx >= 0 && nx < 10 && ny >= 0 && ny < 7) {
-        const targetTile = map[ny][nx];
-        if (targetTile !== 3 && targetTile !== 5) {
+        const targetTile = maps[currentZone][ny][nx];
+        // Cannot pass solid bricks (3), trees (5), or deep water (2)
+        if (targetTile !== 3 && targetTile !== 5 && targetTile !== 2) {
           player.x = nx;
           player.y = ny;
         }
       }
 
-      if (player.x < 3 && player.y > 2) {
-        hud.textContent = "HOWARD ST CEMETERY";
-      } else if (player.x > 3 && player.y < 3) {
-        hud.textContent = "SALEM COMMON";
+      // Update location HUD text
+      if (currentZone === 'downtown') {
+        if (player.x < 3 && player.y > 2) {
+          hud.textContent = "HOWARD ST CEMETERY";
+        } else if (player.x > 3 && player.y < 3) {
+          hud.textContent = "SALEM COMMON";
+        } else {
+          hud.textContent = "ESSEX ST MALL";
+        }
       } else {
-        hud.textContent = "ESSEX ST MALL";
+        hud.textContent = (player.y >= 5) ? "DERBY LIGHTHOUSE" : "DERBY WHARF";
       }
 
+      saveState();
+
+      const zoneNpcs = npcs[currentZone] || {};
       const key = `${player.x},${player.y}`;
-      if (npcs[key]) {
-        message = npcs[key].text;
+      if (zoneNpcs[key]) {
+        message = zoneNpcs[key].text;
       } else {
-        message = `Exploring ${hud.textContent}...`;
+        message = `Roaming ${hud.textContent}...`;
       }
 
       render();
@@ -502,40 +599,47 @@
         if (player.dir === 'left') tx--;
         if (player.dir === 'right') tx++;
 
+        const zoneNpcs = npcs[currentZone] || {};
         const targetKey = `${tx},${ty}`;
-        if (npcs[targetKey]) {
-          startBattle(npcs[targetKey]);
+        if (zoneNpcs[targetKey]) {
+          startBattle(zoneNpcs[targetKey], targetKey);
           return;
         } else {
-          message = "Inspected: Cobblestone and chilly air.";
+          message = "Inspected: Quiet coastal stones.";
         }
       } else if (mode === 'BATTLE') {
         if (battleMenuIdx === 0) { // TALK
-          message = `${currentEnemy.name} shared ancient Salem lore!`;
+          message = `${currentEnemy.name} calmed down slightly.`;
           currentEnemy.hp = Math.max(0, currentEnemy.hp - 10);
         } else if (battleMenuIdx === 1) { // WARD
-          playSound('hit');
-          message = `You held up Cold Iron! Spirit calms.`;
+          playSound('pacify');
+          message = `Brandished Cold Iron! Peace falls.`;
           currentEnemy.hp = Math.max(0, currentEnemy.hp - 15);
         } else if (battleMenuIdx === 2) { // ITEM
           if (inventory.length > 0) {
             const used = inventory.shift();
-            message = `Offered ${used}! Spirit smiles.`;
+            message = `Offered ${used}! Spirit soothed.`;
             player.hp = Math.min(player.maxHp, player.hp + 10);
             currentEnemy.hp = 0;
+            saveState();
           } else {
-            message = "No items left in pack!";
+            message = "Pack empty of soothing items!";
           }
         } else if (battleMenuIdx === 3) { // RUN
-          message = "Escaped back to Essex Street!";
+          message = "Retreated back into the crowd.";
           mode = 'EXPLORE';
           render();
           return;
         }
 
         if (currentEnemy.hp <= 0) {
+          playSound('pacify');
+          if (currentEnemy.reward && !inventory.includes(currentEnemy.reward)) {
+            inventory.push(currentEnemy.reward);
+            saveState();
+          }
           setTimeout(() => {
-            message = `${currentEnemy.name} is peaceful. Journey on!`;
+            message = `${currentEnemy.name} passed on peace! Got loot.`;
             mode = 'EXPLORE';
             render();
           }, 800);
@@ -545,40 +649,4 @@
     }
 
     function handleB() {
-      playSound('select');
-      if (mode === 'BATTLE') {
-        mode = 'EXPLORE';
-        message = "Fled the encounter.";
-      } else {
-        message = `Pack: ${inventory.join(', ') || 'Empty'}`;
-      }
-      render();
-    }
-
-    const bind = (id, fn) => {
-      document.getElementById(id).addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        fn();
-      });
-    };
-
-    bind('btn-up', () => move(0, -1, 'up'));
-    bind('btn-down', () => move(0, 1, 'down'));
-    bind('btn-left', () => move(-1, 0, 'left'));
-    bind('btn-right', () => move(1, 0, 'right'));
-    bind('btn-a', handleA);
-    bind('btn-b', handleB);
-
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowUp' || e.key === 'w') move(0, -1, 'up');
-      if (e.key === 'ArrowDown' || e.key === 's') move(0, 1, 'down');
-      if (e.key === 'ArrowLeft' || e.key === 'a') move(-1, 0, 'left');
-      if (e.key === 'ArrowRight' || e.key === 'd') move(1, 0, 'right');
-      if (e.key === 'z') handleA();
-      if (e.key === 'x') handleB();
-    });
-
-    render();
-  </script>
-</body>
-</html>
+      playSound('select
