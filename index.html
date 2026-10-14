@@ -6,8 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#2b1b3d">
-<title>SALEM '99: GBC Edition</title>
+<meta name="theme-color" content="#241436">
+<title>SALEM 1998: GBC Walking Tour</title>
 <style>
   * {
     box-sizing: border-box;
@@ -20,51 +20,47 @@
   html, body {
     width: 100%;
     height: 100%;
-    background-color: #120a1c;
+    background-color: #0d0714;
     font-family: 'Courier New', Courier, monospace;
     overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
   }
-  /* Atomic Purple / Midnight Grape GBC Shell */
   .gbc-shell {
     width: 100%;
     max-width: 430px;
     height: 100dvh;
-    max-height: 880px;
-    background: linear-gradient(145deg, #3b2354 0%, #241436 100%);
+    max-height: 890px;
+    background: linear-gradient(145deg, #3b2354 0%, #1e102e 100%);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px 20px 16px;
-    border-radius: 18px 18px 42px 18px;
-    box-shadow: inset 0 0 12px rgba(255,255,255,0.12), 0 12px 35px rgba(0,0,0,0.8);
-    position: relative;
+    padding: 10px 14px 18px 14px;
+    border-radius: 16px 16px 40px 16px;
+    box-shadow: inset 0 0 12px rgba(255,255,255,0.12), 0 12px 35px rgba(0,0,0,0.9);
   }
-  /* Screen Lens Bezel */
   .screen-bezel {
     width: 100%;
-    background: #191921;
-    border-radius: 12px 12px 28px 12px;
-    padding: 14px 18px 20px 18px;
-    box-shadow: inset 0 3px 8px rgba(0,0,0,0.9), 0 2px 2px rgba(255,255,255,0.08);
+    background: #17171f;
+    border-radius: 10px 10px 26px 10px;
+    padding: 10px 14px 14px 14px;
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.9);
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: relative;
   }
   .bezel-top {
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     font-size: 10px;
-    color: #888;
+    color: #9ca3af;
     font-weight: bold;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
   }
   .power-led {
     display: flex;
@@ -82,10 +78,9 @@
     width: 100%;
     aspect-ratio: 10 / 9;
     background: #f8f0d8;
-    border: 3px solid #0a0a0f;
+    border: 3px solid #08080c;
     border-radius: 4px;
     overflow: hidden;
-    position: relative;
   }
   canvas {
     width: 100%;
@@ -95,50 +90,49 @@
     display: block;
   }
   .gbc-logo {
-    margin-top: 8px;
-    font-size: 13px;
+    margin-top: 6px;
+    font-size: 12px;
     font-weight: 900;
     font-style: italic;
     letter-spacing: 1.5px;
     color: #b8b8c8;
   }
-  .gbc-logo span.c1 { color: #ff3b56; }
-  .gbc-logo span.c2 { color: #a855f7; }
-  .gbc-logo span.c3 { color: #22c55e; }
-  .gbc-logo span.c4 { color: #eab308; }
-  .gbc-logo span.c5 { color: #3b82f6; }
+  .gbc-logo .c1 { color: #ff3b56; }
+  .gbc-logo .c2 { color: #a855f7; }
+  .gbc-logo .c3 { color: #22c55e; }
+  .gbc-logo .c4 { color: #eab308; }
+  .gbc-logo .c5 { color: #3b82f6; }
 
-  /* HUD strip under bezel */
   .hud-strip {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    padding: 6px 8px;
-    font-size: 11px;
-    color: #c4b5fd;
-    background: rgba(0, 0, 0, 0.25);
+    align-items: center;
+    padding: 5px 8px;
+    font-size: 10px;
+    font-weight: bold;
+    color: #e9d5ff;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: 6px;
     margin-top: 4px;
   }
 
-  /* Controls Area */
   .controls-area {
     width: 100%;
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    padding-top: 6px;
+    padding-top: 4px;
   }
   .main-pad-row {
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 8px;
+    padding: 0 6px;
   }
-
-  /* Cross D-Pad */
   .dpad {
     position: relative;
     width: 132px;
@@ -149,7 +143,7 @@
     background: #1e1e26;
     border: 2px solid #101015;
     box-shadow: 0 4px 0 #09090c;
-    color: #666;
+    color: #777;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -161,7 +155,7 @@
   .dpad-btn:active, .dpad-btn.pressed {
     transform: translateY(2px);
     box-shadow: 0 1px 0 #09090c;
-    background: #2c2c38;
+    background: #2e2e3a;
     color: #fff;
   }
   .dpad-up { top: 0; left: 44px; width: 44px; height: 46px; border-radius: 6px 6px 0 0; }
@@ -188,13 +182,12 @@
     background: radial-gradient(circle, #14141a 20%, #252530 100%);
   }
 
-  /* A / B Action Buttons */
   .ab-cluster {
     display: flex;
-    gap: 18px;
+    gap: 16px;
     transform: rotate(-24deg);
-    background: rgba(0,0,0,0.18);
-    padding: 12px 18px;
+    background: rgba(0,0,0,0.2);
+    padding: 12px 16px;
     border-radius: 40px;
   }
   .ab-btn-wrap {
@@ -209,7 +202,7 @@
     background: radial-gradient(circle at 30% 30%, #ff3b6b, #b80f3a);
     border: 2px solid #5a061c;
     box-shadow: 0 5px 0 #3d0312, 0 6px 10px rgba(0,0,0,0.6);
-    color: rgba(255,255,255,0.85);
+    color: rgba(255,255,255,0.9);
     font-weight: 900;
     font-size: 18px;
     display: flex;
@@ -223,19 +216,17 @@
     box-shadow: 0 2px 0 #3d0312;
   }
   .ab-label {
-    margin-top: 6px;
+    margin-top: 5px;
     font-weight: 900;
-    font-size: 12px;
-    color: #a78bfa;
-    letter-spacing: 1px;
+    font-size: 11px;
+    color: #c4b5fd;
   }
 
-  /* Start / Select Row */
   .meta-row {
     display: flex;
     justify-content: center;
     gap: 28px;
-    margin-top: 6px;
+    margin-top: 2px;
   }
   .pill-wrap {
     display: flex;
@@ -258,28 +249,26 @@
     box-shadow: none;
   }
   .pill-label {
-    margin-top: 8px;
-    font-size: 10px;
+    margin-top: 7px;
+    font-size: 9px;
     font-weight: bold;
     color: #9ca3af;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
   }
 </style>
 </head>
 <body>
 
 <div class="gbc-shell">
-  <!-- Top Screen Area -->
   <div class="screen-bezel">
     <div class="bezel-top">
       <div class="power-led">
-        <div class="led-dot" id="ledDot"></div>
-        <span>BATTERY</span>
+        <div class="led-dot"></div>
+        <span>SALEM GPS</span>
       </div>
-      <span>SALEM Witch City '99</span>
+      <span id="coordLabel">X:36 Y:20</span>
     </div>
     <div class="canvas-wrap">
-      <!-- Native GBC resolution 160x144 scaled up cleanly -->
       <canvas id="gbcCanvas" width="160" height="144"></canvas>
     </div>
     <div class="gbc-logo">
@@ -287,14 +276,12 @@
     </div>
   </div>
 
-  <!-- Quick Status Strip -->
   <div class="hud-strip">
-    <span id="zoneLabel">LOC: ESSEX ST MALL</span>
-    <span id="logLabel">SPIRIT LOG: 0/6</span>
-    <span id="soundLabel">SND: OFF</span>
+    <span id="streetLabel">ESSEX PEDESTRIAN MALL</span>
+    <span id="tourLabel">TOUR: 0/15</span>
+    <span id="spiritsLabel">LOG: 0/6</span>
   </div>
 
-  <!-- Touch Controls -->
   <div class="controls-area">
     <div class="main-pad-row">
       <div class="dpad">
@@ -308,11 +295,11 @@
       <div class="ab-cluster">
         <div class="ab-btn-wrap">
           <div class="ab-btn" data-key="B">B</div>
-          <div class="ab-label">B</div>
+          <div class="ab-label">B / BACK</div>
         </div>
         <div class="ab-btn-wrap">
           <div class="ab-btn" data-key="A">A</div>
-          <div class="ab-label">A</div>
+          <div class="ab-label">A / CHECK</div>
         </div>
       </div>
     </div>
@@ -320,11 +307,11 @@
     <div class="meta-row">
       <div class="pill-wrap">
         <div class="pill-btn" data-key="SELECT"></div>
-        <div class="pill-label">SOUND</div>
+        <div class="pill-label">SELECT (GPS MAP)</div>
       </div>
       <div class="pill-wrap">
         <div class="pill-btn" data-key="START"></div>
-        <div class="pill-label">MENU / SAVE</div>
+        <div class="pill-label">START (GUIDE/SND)</div>
       </div>
     </div>
   </div>
@@ -336,65 +323,441 @@
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingEnabled = false;
 
-  // --- GBC 56-COLOR AUTUMN PALETTE ---
+  // --- GBC 56-COLOR PALETTE ---
   const PAL = {
     BG_CREAM: '#f8f0d8',
     INK: '#181020',
-    BRICK: '#b84030',
+    BRICK: '#b83c28',
     BRICK_HI: '#d86850',
     PAVE: '#c8c0b0',
-    PAVE_DARK: '#908878',
-    GRASS: '#508840',
+    PAVE_DARK: '#888070',
+    GRASS: '#488838',
     LEAF_ORG: '#e87820',
     LEAF_YEL: '#f8b830',
-    WATER: '#2858a8',
-    WATER_HI: '#5890e0',
+    WATER: '#205098',
+    WATER_HI: '#5088d8',
     WOOD: '#885830',
     WOOD_HI: '#b07848',
     ROOF_PURP: '#483068',
-    ROOF_RED: '#882828',
+    ROOF_SLATE: '#384050',
     WALL_TAN: '#e0d0b0',
-    WALL_DARK: '#383040',
-    STONE: '#889098',
+    WALL_BRICK: '#983028',
+    STONE: '#9098a0',
     GOLD: '#f8c830',
     GHOST_CYAN: '#78e8d8',
     TORTIE_ORG: '#d87028',
+    FENCE: '#282830',
     HP_GREEN: '#38b848',
     HP_RED: '#d83030'
   };
 
-  // --- AUDIO SYNTHESIZER (8-Bit Web Audio) ---
+  // --- FAITHFUL 80x60 SALEM CITY GRID GENERATOR ---
+  // Tile Legend:
+  // 0: Asphalt / Sidewalk Street (Walkable)
+  // 1: Red Brick Pedestrian Mall / Derby Sq (Walkable)
+  // 2: Historic Clapboard / Brick Wall (Solid)
+  // 3: Gabled Slate Roof (Solid)
+  // 4: Autumn Tree (Solid)
+  // 5: Haunted Grass / October Leaves (Walkable - Encounters)
+  // 6: Salem Harbor Water (Solid)
+  // 7: Derby Wharf Timber Planks (Walkable)
+  // 8: Cemetery Headstone / Statue (Solid - Read)
+  // 9: Gold Historic Landmark Plaque / Door (Solid - Walking Tour Stamp!)
+  // 10: Iron Fence / Train Tunnel Wall (Solid)
+  const MAP_W = 80;
+  const MAP_H = 60;
+  const WORLD_MAP = Array.from({ length: MAP_H }, () => Array(MAP_W).fill(4));
+
+  function fillRect(x0, y0, w, h, tile) {
+    for (let y = Math.max(0, y0); y < Math.min(MAP_H, y0 + h); y++) {
+      for (let x = Math.max(0, x0); x < Math.min(MAP_W, x0 + w); x++) {
+        WORLD_MAP[y][x] = tile;
+      }
+    }
+  }
+
+  function buildBuilding(x, y, w, h, plaqueX = null, landmarkId = null) {
+    fillRect(x, y, w, h - 1, 3); // Gabled Roof
+    fillRect(x, y + h - 1, w, 1, 2); // Front Facade
+    if (plaqueX !== null) {
+      WORLD_MAP[y + h - 1][plaqueX] = 9;
+      if (landmarkId) {
+        LANDMARK_COORDS[`${plaqueX},${y + h - 1}`] = landmarkId;
+      }
+    }
+  }
+
+  // --- 15 REAL SALEM WALKING TOUR LANDMARKS ---
+  const LANDMARKS = {
+    ropes: {
+      id: 'ropes',
+      title: 'ROPES MANSION (318 Essex St)',
+      desc: 'ROPES MANSION (1727): Georgian Revival home operated by PEM. Famous for its colonial gardens—and as Alison\'s house in Hocus Pocus!'
+    },
+    witch_house: {
+      id: 'witch_house',
+      title: 'THE WITCH HOUSE (310 Essex St)',
+      desc: 'THE WITCH HOUSE (c. 1642): Home of Judge Jonathan Corwin. The only structure still standing in Salem with direct ties to the 1692 Witch Trials.'
+    },
+    mbta_portal: {
+      id: 'mbta_portal',
+      title: 'OLD WASHINGTON ST TUNNEL (1839)',
+      desc: 'GRANITE TRAIN PORTAL (Washington St): Built in 1839 by the Eastern Railroad right underneath downtown Washington Street.'
+    },
+    howard_cemetery: {
+      id: 'howard_cemetery',
+      title: 'HOWARD ST CEMETERY (1801)',
+      desc: 'HOWARD ST CEMETERY (Bridge & Howard): Traditionally held to be the field where Giles Corey was pressed to death on Sept 19, 1692.'
+    },
+    lyceum: {
+      id: 'lyceum',
+      title: 'SALEM LYCEUM (43 Church St)',
+      desc: 'SALEM LYCEUM HALL (1831): Where Alexander Graham Bell made the first public demonstration of the long-distance telephone in 1877!'
+    },
+    bewitched: {
+      id: 'bewitched',
+      title: 'BEWITCHED STATUE (Essex & Wash)',
+      desc: 'BEWITCHED STATUE (2005): Bronze statue of Elizabeth Montgomery as Samantha Stephens at the corner of Essex & Washington St.'
+    },
+    old_town_hall: {
+      id: 'old_town_hall',
+      title: 'OLD TOWN HALL (32 Derby Sq)',
+      desc: 'OLD TOWN HALL (1816): Federal-style market house and civic hall designed by Charles Bulfinch in the heart of Derby Square.'
+    },
+    pem: {
+      id: 'pem',
+      title: 'PEABODY ESSEX MUSEUM (161 Essex)',
+      desc: 'PEABODY ESSEX MUSEUM (Founded 1799): One of the oldest continuously operating museums in America, housing global maritime treasures.'
+    },
+    burying_point: {
+      id: 'burying_point',
+      title: 'OLD BURYING POINT (Charter St)',
+      desc: 'CHARTER ST CEMETERY (Est. 1637): Final resting place of Judge John Hathorne, Mayflower passenger Richard More, and colonial governors.'
+    },
+    memorial: {
+      id: 'memorial',
+      title: 'WITCH TRIALS MEMORIAL (Liberty)',
+      desc: 'WITCH TRIALS MEMORIAL (1992): Twenty granite benches cantilevered from the stone wall bearing the names of the innocent executed in 1692.'
+    },
+    hawthorne_hotel: {
+      id: 'hawthorne_hotel',
+      title: 'HAWTHORNE HOTEL (18 Wash Sq W)',
+      desc: 'HAWTHORNE HOTEL (1925): Historic brick hotel overlooking Salem Common. Hosted the cast of Bewitched in 1970.'
+    },
+    witch_museum: {
+      id: 'witch_museum',
+      title: 'SALEM WITCH MUSEUM (Wash Sq N)',
+      desc: 'SALEM WITCH MUSEUM (1846 Stone Church): Iconic Gothic Revival church facing Salem Common.'
+    },
+    salem_common: {
+      id: 'salem_common',
+      title: 'SALEM COMMON BANDSTAND',
+      desc: 'SALEM COMMON (1636): 8-acre public park where the Massachusetts Bay militia muster held the first National Guard drill in 1637.'
+    },
+    custom_house: {
+      id: 'custom_house',
+      title: 'U.S. CUSTOM HOUSE (178 Derby St)',
+      desc: 'U.S. CUSTOM HOUSE (1819): Where Nathaniel Hawthorne worked as Surveyor of the Port in 1846 and conceived The Scarlet Letter.'
+    },
+    seven_gables: {
+      id: 'seven_gables',
+      title: 'HOUSE OF SEVEN GABLES (54 Turner)',
+      desc: 'THE HOUSE OF THE SEVEN GABLES (1668): The Turner-Ingersoll Mansion right on the harbor that inspired Hawthorne\'s 1851 Gothic novel.'
+    }
+  };
+
+  const LANDMARK_COORDS = {};
+
+  function generateSalemMap() {
+    // 1. Base Greenery & Haunted Autumn Leaves
+    fillRect(2, 2, 76, 36, 5);
+
+    // 2. Salem Harbor (South of Y=38)
+    fillRect(0, 38, 80, 22, 6);
+
+    // 3. Major North-South Streets
+    fillRect(15, 2, 3, 30, 0); // North St / Summer St
+    fillRect(27, 2, 4, 34, 0); // Washington St (Wide main artery)
+    fillRect(42, 12, 2, 26, 0); // Central St / Liberty St
+    fillRect(54, 4, 4, 34, 0); // Hawthorne Blvd / Washington Sq W
+
+    // 4. Major East-West Streets
+    fillRect(10, 5, 50, 2, 0); // Bridge St / Howard St Corridor
+    fillRect(15, 12, 42, 2, 0); // Church St
+    fillRect(2, 19, 26, 3, 0); // West Essex St (Ropes Mansion & Witch House)
+    fillRect(27, 19, 28, 3, 1); // ESSEX ST RED BRICK PEDESTRIAN MALL!
+    fillRect(55, 19, 20, 3, 0); // East Essex St
+    fillRect(27, 27, 30, 2, 0); // Charter St
+    fillRect(15, 35, 62, 3, 0); // Derby St Waterfront Corridor
+
+    // 5. Howard Street Cemetery (North of Church, East of Washington)
+    fillRect(32, 6, 14, 5, 5);
+    WORLD_MAP[8][35] = 8;
+    WORLD_MAP[8][39] = 8;
+    WORLD_MAP[9][42] = 9;
+    LANDMARK_COORDS['42,9'] = 'howard_cemetery';
+
+    // 6. Ropes Mansion & Gardens (318 Essex St - Far West)
+    buildBuilding(5, 15, 6, 4, 8, 'ropes');
+    fillRect(5, 11, 6, 4, 5); // Ropes Gardens
+
+    // 7. The Witch House (310 Essex St - Corner of Essex & North St)
+    buildBuilding(12, 15, 5, 4, 14, 'witch_house');
+
+    // 8. Washington St Train Tunnel Portal
+    WORLD_MAP[10][28] = 10;
+    WORLD_MAP[10][29] = 9;
+    LANDMARK_COORDS['29,10'] = 'mbta_portal';
+
+    // 9. Salem Lyceum (43 Church St)
+    buildBuilding(20, 8, 5, 4, 22, 'lyceum');
+
+    // 10. Bewitched Statue (Corner of Essex & Washington St)
+    WORLD_MAP[19][26] = 9;
+    LANDMARK_COORDS['26,19'] = 'bewitched';
+
+    // 11. Essex Street Pedestrian Mall Shops (Rockafellas, Witch Shops, Bookstores)
+    buildBuilding(31, 15, 5, 4);
+    buildBuilding(37, 15, 5, 4);
+
+    // 12. Peabody Essex Museum (PEM - 161 Essex St)
+    buildBuilding(44, 14, 9, 5, 48, 'pem');
+
+    // 13. Derby Square & Old Town Hall (South of Essex Mall between Wash & Central)
+    fillRect(31, 22, 10, 5, 1); // Red brick Derby Square plaza
+    buildBuilding(33, 23, 6, 3, 36, 'old_town_hall');
+
+    // 14. Old Burying Point (Charter St Cemetery 1637) & Witch Trials Memorial
+    fillRect(44, 22, 9, 5, 5);
+    WORLD_MAP[23][46] = 8;
+    WORLD_MAP[24][49] = 8;
+    WORLD_MAP[26][47] = 9;
+    LANDMARK_COORDS['47,26'] = 'burying_point';
+
+    // Witch Trials Memorial (Adjacent on Liberty St)
+    WORLD_MAP[24][52] = 9;
+    LANDMARK_COORDS['52,24'] = 'memorial';
+
+    // 15. Hawthorne Hotel & Salem Witch Museum (Hawthorne Blvd & Wash Sq)
+    buildBuilding(54, 14, 5, 4, 56, 'hawthorne_hotel');
+    buildBuilding(61, 5, 7, 4, 64, 'witch_museum');
+
+    // 16. SALEM COMMON (Large Fenced Octagonal Park on East Side)
+    fillRect(60, 10, 15, 15, 5);
+    // Iron Fence Border with Gates
+    for (let x = 60; x < 75; x++) {
+      WORLD_MAP[10][x] = 10;
+      WORLD_MAP[24][x] = 10;
+    }
+    for (let y = 10; y < 25; y++) {
+      WORLD_MAP[y][60] = 10;
+      WORLD_MAP[y][74] = 10;
+    }
+    WORLD_MAP[17][60] = 0; // West Arch Gate
+    WORLD_MAP[10][64] = 0; // North Gate toward Witch Museum
+    WORLD_MAP[24][67] = 0; // South Gate
+    // Bandstand in center of Salem Common
+    WORLD_MAP[17][67] = 9;
+    LANDMARK_COORDS['67,17'] = 'salem_common';
+
+    // 17. U.S. Custom House (178 Derby St)
+    buildBuilding(46, 31, 7, 4, 49, 'custom_house');
+
+    // 18. DERBY WHARF (Long wooden pier extending south into Salem Harbor)
+    fillRect(48, 38, 3, 19, 7);
+    // Derby Wharf Light Station at tip (Y=56)
+    WORLD_MAP[56][49] = 8;
+
+    // 19. House of the Seven Gables (54 Turner St - Far Southeast Waterfront)
+    fillRect(71, 35, 3, 6, 0); // Turner St going down to harbor
+    buildBuilding(72, 31, 6, 4, 74, 'seven_gables');
+  }
+
+  generateSalemMap();
+
+  // --- NPCs ACROSS DOWNTOWN SALEM ---
+  const NPCS = [
+    {
+      id: 'beans',
+      name: 'JULIETTE (BEANS)',
+      type: 'cat',
+      x: 35, y: 20, // Right on Essex St Red Bricks!
+      heal: true,
+      dialog: [
+        'JULIETTE (BEANS): *Mrrp!* (Your favorite tortie cat is loafing on the warm Essex St bricks.)',
+        'She headbutts your shin! SANITY fully restored & 3 CIDER DONUTS restocked!'
+      ]
+    },
+    {
+      id: 'giles',
+      name: 'GILES COREY',
+      type: 'ghost',
+      x: 38, y: 8, // Howard St Cemetery
+      dialog: [
+        'GILES COREY: "More weight! ...Though honestly, October traffic on Bridge St is heavier."',
+        'GILES COREY: "Did you check the plaque here at Howard St Cemetery yet?"'
+      ]
+    },
+    {
+      id: 'corwin',
+      name: 'JUDGE CORWIN SHADE',
+      type: 'ghost',
+      x: 14, y: 20, // Outside The Witch House
+      dialog: [
+        'SPECTRAL JUDGE: "My 1642 house at 310 Essex St is the last building standing from the Trials."',
+        'SPECTRAL JUDGE: "Walk further west to 318 Essex to see the Ropes Mansion gardens."'
+      ]
+    },
+    {
+      id: 'tourist_bewitched',
+      name: 'MIDWEST TOURIST',
+      type: 'tourist',
+      x: 27, y: 21, // Corner of Essex & Washington
+      dialog: [
+        'TOURIST: "We just took 47 selfies with the Bewitched statue! Wait—where is the pirate museum?"',
+        'YOU: "Head south down Washington or Central toward Derby Street."'
+      ]
+    },
+    {
+      id: 'derby_farmer',
+      name: 'DERBY SQ VENDOR',
+      type: 'tourist',
+      x: 35, y: 26, // Derby Square
+      dialog: [
+        'MARKET VENDOR: "Old Town Hall right behind me dates to 1816! Grab some fresh apple cider!"'
+      ]
+    },
+    {
+      id: 'burying_guide',
+      name: 'HIST. SOCIETY GUIDE',
+      type: 'tourist',
+      x: 47, y: 28, // Charter St
+      dialog: [
+        'TOUR GUIDE: "Welcome to Old Burying Point (1637) and the 1992 Witch Trials Memorial next door."',
+        'TOUR GUIDE: "Press [A] on the gold plaques to stamp your 15-stop Salem Walking Tour!"'
+      ]
+    },
+    {
+      id: 'common_skater',
+      name: 'INLINE SKATER',
+      type: 'tourist',
+      x: 57, y: 18, // Hawthorne Blvd / Salem Common
+      dialog: [
+        'SKATER: "The pavement loop around Salem Common is butter for 80mm urethane wheels, dude."'
+      ]
+    },
+    {
+      id: 'hawthorne',
+      name: 'NATHANIEL HAWTHORNE',
+      type: 'ghost',
+      x: 49, y: 45, // Halfway out on Derby Wharf
+      dialog: [
+        'N. HAWTHORNE: "I stared out at Derby Wharf from the Custom House window every day in 1846."',
+        'N. HAWTHORNE: "Walk east along Derby St to Turner St if you want to see the Seven Gables."'
+      ]
+    },
+    {
+      id: 'gables_cat',
+      name: 'TURNER ST BLACK CAT',
+      type: 'cat',
+      x: 73, y: 36, // Outside House of Seven Gables
+      dialog: [
+        'VOID CAT: *Purrrr.* "I guard the secret staircase inside the 1668 Turner-Ingersoll Mansion."'
+      ]
+    }
+  ];
+
+  // --- WILD ENCOUNTERS ---
+  const ENCOUNTERS = [
+    {
+      id: 'puritan_wraith',
+      name: '1692 MAGISTRATE',
+      lvl: 6,
+      maxHp: 30,
+      atk: 6,
+      type: 'ghost',
+      intro: 'A spectral 1692 MAGISTRATE rose from the burying ground!',
+      moves: ['SPECTRAL EVIDENCE', 'COURT SUMMONS']
+    },
+    {
+      id: 'privateer',
+      name: 'DERBY PRIVATEER',
+      lvl: 7,
+      maxHp: 34,
+      atk: 7,
+      type: 'ghost',
+      intro: 'A ghostly 1812 PRIVATEER drifted in off Salem Harbor!',
+      moves: ['HARBOR FOG', 'BROADSIDES']
+    },
+    {
+      id: 'hocus_crowd',
+      name: 'VELOUR HAT MOB',
+      lvl: 5,
+      maxHp: 26,
+      atk: 5,
+      type: 'tourist',
+      intro: 'A confused VELOUR HAT MOB stopped dead in the crosswalk!',
+      moves: ['GROUP SELFIE', 'ASK FOR BATHROOM']
+    },
+    {
+      id: 'keytar_vamp',
+      name: 'ESSEX BUSKER',
+      lvl: 6,
+      maxHp: 28,
+      atk: 6,
+      type: 'tourist',
+      intro: 'An amplified ESSEX ST BUSKER blocks the brick mall!',
+      moves: ['HALLOWEEN THEME', 'TIP BUCKET SHAKE']
+    },
+    {
+      id: 'sea_captain',
+      name: 'EAST INDIA CAPTAIN',
+      lvl: 9,
+      maxHp: 40,
+      atk: 8,
+      type: 'ghost',
+      intro: 'CAPTAIN\'S PHANTOM guards the Custom House steps!',
+      moves: ['SPICE TRADE GALE', 'SEXTANT GLARE']
+    },
+    {
+      id: 'harbor_gull',
+      name: 'WHARF SEAGULL',
+      lvl: 4,
+      maxHp: 22,
+      atk: 5,
+      type: 'tourist',
+      intro: 'An aggressive DERBY WHARF GULL dives at your Cider Donut!',
+      moves: ['FRY SNATCH', 'SONIC SQUAWK']
+    }
+  ];
+
+  // --- AUDIO ENGINE ---
   let audioCtx = null;
   let soundEnabled = false;
   let bgmTimer = null;
   let noteIdx = 0;
-
-  // Spooky GBC Chiptune Loop (D minor / Phrygian vibe)
   const TOWN_NOTES = [293.66, 349.23, 440.00, 349.23, 329.63, 293.66, 261.63, 220.00];
   const BATTLE_NOTES = [392.00, 415.30, 392.00, 329.63, 466.16, 440.00, 392.00, 311.13];
 
   function toggleSound() {
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     soundEnabled = !soundEnabled;
-    document.getElementById('soundLabel').textContent = `SND: ${soundEnabled ? 'ON' : 'OFF'}`;
     if (soundEnabled) {
-      playSfx(660, 0.08, 'square');
+      playSfx(660, 0.08);
       startBgm();
     } else {
       stopBgm();
     }
   }
 
-  function playSfx(freq, dur = 0.08, type = 'square') {
+  function playSfx(freq, dur = 0.07, type = 'square') {
     if (!soundEnabled || !audioCtx) return;
     try {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = type;
       osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
@@ -409,8 +772,7 @@
     bgmTimer = setInterval(() => {
       if (!soundEnabled) return;
       const list = state.mode === 'BATTLE' ? BATTLE_NOTES : TOWN_NOTES;
-      const f = list[noteIdx % list.length];
-      playSfx(f, state.mode === 'BATTLE' ? 0.12 : 0.22, 'triangle');
+      playSfx(list[noteIdx % list.length], state.mode === 'BATTLE' ? 0.11 : 0.2, 'triangle');
       noteIdx++;
     }, state.mode === 'BATTLE' ? 160 : 320);
   }
@@ -420,313 +782,145 @@
     bgmTimer = null;
   }
 
-  function vibrate(ms = 18) {
+  function vibrate(ms = 14) {
     if (navigator.vibrate) navigator.vibrate(ms);
   }
 
-  // --- MAP DEFINITION (24x20 Downtown Salem Grid) ---
-  // Legend:
-  // 0: Sidewalk/Pavement
-  // 1: Essex St Red Brick Mall
-  // 2: Building Wall (Solid)
-  // 3: Dark Roof / Witch House (Solid)
-  // 4: Autumn Tree (Solid)
-  // 5: Tall Leaves / Cemetery Grass (Triggers Wild Encounters!)
-  // 6: Salem Harbor Water (Solid)
-  // 7: Derby Wharf Wood Plank (Walkable)
-  // 8: Gravestone / Monument (Solid / Interactable)
-  // 9: Shop Door / Sign (Solid / Interactable)
-  const MAP_W = 24;
-  const MAP_H = 20;
-  const WORLD_MAP = [
-    [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],
-    [4,3,3,3,3,4,0,0,0,5,5,4,4,3,3,3,3,3,4,5,5,5,4,4],
-    [4,2,2,9,2,4,0,8,0,5,5,0,0,2,2,9,2,2,4,5,8,5,5,4],
-    [4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,4],
-    [4,0,3,3,3,0,0,3,3,3,3,0,0,3,3,3,3,0,0,4,0,0,0,4],
-    [4,0,2,9,2,0,0,2,9,2,2,0,0,2,9,2,2,0,0,4,3,3,3,4],
-    [4,1,1,1,1,1,1,1,1,1,1,8,1,1,1,1,1,1,1,1,2,9,2,4],
-    [4,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4],
-    [4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4],
-    [4,5,5,5,0,0,4,4,8,8,8,8,8,4,4,0,0,3,3,3,0,5,5,4],
-    [4,5,8,5,0,0,4,5,5,8,5,8,5,5,4,0,0,2,9,2,0,5,5,4],
-    [4,5,5,5,0,0,4,5,8,5,5,5,8,5,4,0,0,0,0,0,0,5,5,4],
-    [4,0,0,0,0,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,4],
-    [4,0,3,3,3,0,0,0,0,0,0,0,0,0,3,3,3,3,0,0,4,4,4,4],
-    [4,0,2,9,2,0,0,0,0,0,0,0,0,0,2,2,9,2,0,0,0,0,0,4],
-    [4,0,0,0,0,0,0,0,0,7,7,7,0,0,0,0,0,0,0,0,0,0,0,4],
-    [6,6,6,6,6,6,6,6,6,7,7,7,6,6,6,6,6,6,6,6,6,6,6,6],
-    [6,6,6,6,6,6,6,6,6,7,7,7,6,6,6,6,6,6,6,6,6,6,6,6],
-    [6,6,6,6,6,6,6,6,6,7,7,7,6,6,6,6,6,6,6,6,6,6,6,6],
-    [6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6]
-  ];
-
-  // Landmarks & Signs (Tile Coordinates)
-  const SIGNS = {
-    '3,2': 'THE WITCH HOUSE (1642): Solid dark timber and serious 17th-century goth energy.',
-    '15,2': 'ROPES MANSION: Lush gardens in the back, zero traffic cones out front.',
-    '3,5': 'ESSEX WITCH EMPORIUM: Smells like Nag Champa, patchouli, and bulk quartz crystals.',
-    '8,5': 'ROCKAFELLAS & GHOST TOURS: Tickets sold out until November 2nd.',
-    '14,5': 'PEABODY ESSEX MUSEUM: World-class art & Yin Yu Tang house inside.',
-    '11,6': 'BEWITCHED STATUE: Elizabeth Montgomery frozen in bronze mid-flight on Essex St!',
-    '21,6': 'HAWTHORNE HOTEL: Fancy ballroom, haunted elevators on the 6th floor.',
-    '3,14': 'SALEM WAX MUSEUM: Creepy wax Puritans staring into your soul since the 90s.',
-    '16,14': 'CUSTOM HOUSE (1819): A carved golden eagle watches over Derby Wharf.',
-    '18,10': 'CHARTER ST CEMETERY GATE: Oldest burying point in Salem (1637).'
-  };
-
-  // --- NPCs (Cats, Historical Icons, Confused Tourists) ---
-  const NPCS = [
-    {
-      id: 'beans',
-      name: 'BEANS (Tortie Cat)',
-      type: 'cat',
-      x: 10, y: 7,
-      dialog: [
-        'BEANS: *Mrrp.* (She judges your footwear from the brick pavement.)',
-        'BEANS: You scratched behind her ear! Your SANITY is fully restored!'
-      ],
-      heal: true
-    },
-    {
-      id: 'giles',
-      name: 'GILES COREY',
-      type: 'ghost',
-      x: 10, y: 11,
-      dialog: [
-        'GILES COREY: "More weight... Wait, is that an iced regular from Dunkin?"',
-        'GILES COREY: "Tell the tourists in the pointy velour hats to stay off my stones."'
-      ]
-    },
-    {
-      id: 'tourist1',
-      name: 'OHIO TOURIST',
-      type: 'tourist',
-      x: 6, y: 7,
-      dialog: [
-        'TOURIST: "Excuse me! Where is the Hocus Pocus ride? Is this Universal Studios?"',
-        'YOU: "Ma\'am, this is a real city and you\'re blocking the crosswalk."'
-      ]
-    },
-    {
-      id: 'hawthorne',
-      name: 'N. HAWTHORNE',
-      type: 'historical',
-      x: 10, y: 16,
-      dialog: [
-        'HAWTHORNE: "I worked at the Custom House to pay rent, and now they sell vampire fangs."',
-        'HAWTHORNE: "Derby Wharf still catches a wicked sea breeze at least."'
-      ]
-    },
-    {
-      id: 'cat2',
-      name: 'CHURCH ST VOID',
-      type: 'cat',
-      x: 16, y: 7,
-      dialog: [
-        'BLACK CAT: *Prrrrt.* "Tourists keep taking flash photos of me thinking I\'m a paid actor."'
-      ]
-    },
-    {
-      id: 'tourist2',
-      name: 'INFLUENCER COUPLE',
-      type: 'tourist',
-      x: 12, y: 7,
-      dialog: [
-        'COUPLE: "Babe, take one more by the Bewitched statue before the crowd walks by!"'
-      ]
-    }
-  ];
-
-  // --- WILD ENCOUNTER ROSTER ---
-  const ENCOUNTERS = [
-    {
-      id: 'lost_tourist',
-      name: 'LOST TOURIST',
-      lvl: 4,
-      maxHp: 22,
-      atk: 4,
-      sprite: 'tourist',
-      intro: 'A wild LOST TOURIST blocked the sidewalk!',
-      moves: ['ASK FOR BATHROOM', 'STOP IN CROSSWALK']
-    },
-    {
-      id: 'puritan_shade',
-      name: 'PURITAN SHADE',
-      lvl: 6,
-      maxHp: 28,
-      atk: 6,
-      sprite: 'ghost',
-      intro: 'A spectral PURITAN SHADE rose from the stones!',
-      moves: ['STERN FINGER WAG', '1692 GUILT TRIP']
-    },
-    {
-      id: 'street_busker',
-      name: 'KEYTAR DRACULA',
-      lvl: 7,
-      maxHp: 32,
-      atk: 7,
-      sprite: 'busker',
-      intro: 'KEYTAR DRACULA challenges your October vibe!',
-      moves: ['SYNTH SOLO', 'TIP JAR SHAKE']
-    },
-    {
-      id: 'harbor_phantom',
-      name: 'PRIVATEER GHOST',
-      lvl: 8,
-      maxHp: 35,
-      atk: 8,
-      sprite: 'pirate',
-      intro: 'PRIVATEER GHOST drifted off Derby Wharf!',
-      moves: ['SEA FOG', 'CANNON ECHO']
-    },
-    {
-      id: 'judge_hathorne',
-      name: 'JUDGE HATHORNE',
-      lvl: 10,
-      maxHp: 45,
-      atk: 9,
-      sprite: 'ghost',
-      intro: 'SPECTRAL MAGISTRATE appeared near Charter St!',
-      moves: ['SPECTRAL EVIDENCE', 'GAVEL SLAM']
-    },
-    {
-      id: 'alley_gremlin',
-      name: 'CIDER THIEF GULL',
-      lvl: 5,
-      maxHp: 25,
-      atk: 5,
-      sprite: 'gull',
-      intro: 'A bold SALEM SEAGULL dives for your donut!',
-      moves: ['FRENCH FRY SNATCH', 'PIERCING SQUAWK']
-    }
-  ];
-
   // --- GAME STATE ---
   const state = {
-    mode: 'TITLE', // TITLE, EXPLORE, DIALOG, BATTLE, MENU
+    mode: 'TITLE', // TITLE, EXPLORE, DIALOG, BATTLE, MINIMAP, GUIDE
     player: {
-      x: 11,
-      y: 8,
+      x: 34,
+      y: 20, // Starts right on Essex St Pedestrian Mall next to Beans!
       dir: 'DOWN',
       stepFrame: 0,
-      hp: 40,
-      maxHp: 40,
+      hp: 45,
+      maxHp: 45,
       donuts: 3,
-      captured: []
+      visitedLandmarks: [],
+      capturedSpirits: []
     },
     dialogQueue: [],
     battle: null,
-    menuIdx: 0,
     animTick: 0
   };
 
-  // Load saved game if available
+  // Load persistence
   try {
-    const saved = localStorage.getItem('salem_gbc_99');
+    const saved = localStorage.getItem('salem_1998_walking_tour');
     if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed && parsed.captured) {
-        state.player.captured = parsed.captured;
-      }
+      const data = JSON.parse(saved);
+      if (data.visitedLandmarks) state.player.visitedLandmarks = data.visitedLandmarks;
+      if (data.capturedSpirits) state.player.capturedSpirits = data.capturedSpirits;
     }
   } catch (e) {}
 
-  function saveProgress() {
+  function saveGame() {
     try {
-      localStorage.setItem('salem_gbc_99', JSON.stringify({
-        captured: state.player.captured
+      localStorage.setItem('salem_1998_walking_tour', JSON.stringify({
+        visitedLandmarks: state.player.visitedLandmarks,
+        capturedSpirits: state.player.capturedSpirits
       }));
     } catch (e) {}
   }
 
-  function updateHud() {
-    let zone = 'DOWNTOWN SALEM';
-    const py = state.player.y;
-    if (py >= 6 && py <= 8) zone = 'ESSEX ST MALL';
-    else if (py >= 9 && py <= 12) zone = 'OLD BURYING POINT';
-    else if (py >= 15) zone = 'DERBY WHARF';
-    else if (py <= 5) zone = 'HISTORIC DISTRICT';
-
-    document.getElementById('zoneLabel').textContent = `LOC: ${zone}`;
-    document.getElementById('logLabel').textContent = `SPIRITS: ${state.player.captured.length}/${ENCOUNTERS.length}`;
+  // --- REAL-TIME STREET NAME LOOKUP ---
+  function getStreetName(x, y) {
+    if (x >= 60 && x <= 74 && y >= 10 && y <= 24) return 'SALEM COMMON (1636)';
+    if (y >= 38 && x >= 47 && x <= 51) return 'DERBY WHARF PIER';
+    if (y >= 34 && y <= 38 && x >= 68) return 'TURNER ST / 7 GABLES';
+    if (y >= 34 && y <= 38) return 'DERBY ST WATERFRONT';
+    if (y >= 22 && y <= 27 && x >= 43 && x <= 53) return 'OLD BURYING POINT';
+    if (y >= 22 && y <= 26 && x >= 31 && x <= 41) return 'DERBY SQUARE PLAZA';
+    if (y >= 26 && y <= 29) return 'CHARTER STREET';
+    if (y >= 18 && y <= 22 && x >= 27 && x <= 54) return 'ESSEX PEDESTRIAN MALL';
+    if (y >= 18 && y <= 22 && x < 27) return 'WEST ESSEX (HISTORIC)';
+    if (y >= 11 && y <= 14) return 'CHURCH STREET';
+    if (y <= 10 && x >= 31 && x <= 46) return 'HOWARD ST CEMETERY';
+    if (x >= 26 && x <= 31) return 'WASHINGTON STREET';
+    if (x >= 53 && x <= 58) return 'HAWTHORNE BOULEVARD';
+    if (x >= 14 && x <= 18) return 'NORTH / SUMMER ST';
+    return 'DOWNTOWN SALEM MA';
   }
 
-  // --- DIALOG & BATTLE HELPERS ---
-  function startDialog(lines, onComplete = null) {
+  function updateHud() {
+    const { x, y, visitedLandmarks, capturedSpirits } = state.player;
+    document.getElementById('coordLabel').textContent = `X:${x} Y:${y}`;
+    document.getElementById('streetLabel').textContent = getStreetName(x, y);
+    document.getElementById('tourLabel').textContent = `TOUR: ${visitedLandmarks.length}/15`;
+    document.getElementById('spiritsLabel').textContent = `LOG: ${capturedSpirits.length}/6`;
+  }
+
+  // --- DIALOG & BATTLE LOGIC ---
+  function startDialog(lines) {
     state.mode = 'DIALOG';
     state.dialogQueue = [...lines];
-    state.dialogCallback = onComplete;
-    playSfx(520, 0.06);
+    playSfx(540, 0.06);
   }
 
   function startBattle() {
-    const template = ENCOUNTERS[Math.floor(Math.random() * ENCOUNTERS.length)];
+    const t = ENCOUNTERS[Math.floor(Math.random() * ENCOUNTERS.length)];
     state.mode = 'BATTLE';
     state.battle = {
-      enemy: { ...template, hp: template.maxHp },
-      phase: 'INTRO', // INTRO, MENU, MSG
+      enemy: { ...t, hp: t.maxHp },
+      phase: 'INTRO',
       cursor: 0,
-      msg: template.intro,
+      msg: t.intro,
       nextPhase: 'MENU'
     };
-    playSfx(220, 0.15, 'sawtooth');
+    playSfx(220, 0.14, 'sawtooth');
     startBgm();
   }
 
-  function handleBattleAction(choice) {
+  function handleBattleChoice(idx) {
     const b = state.battle;
     const e = b.enemy;
-    playSfx(600, 0.07);
+    playSfx(600, 0.06);
 
-    if (choice === 0) {
-      // DROP LOCAL LORE
-      const dmg = 9 + Math.floor(Math.random() * 6);
+    if (idx === 0) {
+      // SEA SALT TOSS (Strong vs Ghosts, Solid vs Tourists)
+      const dmg = 11 + Math.floor(Math.random() * 6);
       e.hp = Math.max(0, e.hp - dmg);
-      b.msg = `You dropped actual 1692 history! ${e.name} lost ${dmg} EGO!`;
+      b.msg = `Cast pure SEA SALT! ${e.name} lost ${dmg} EGO!`;
       b.phase = 'MSG';
-      if (e.hp <= 0) {
-        b.nextPhase = 'WIN';
-      } else {
-        b.nextPhase = 'ENEMY_TURN';
-      }
-    } else if (choice === 1) {
-      // CAPTURE IN SPIRIT LOG
+      b.nextPhase = (e.hp <= 0) ? 'WIN' : 'ENEMY_TURN';
+    } else if (idx === 1) {
+      // IRON AMULET (Pacify & Log in Spirit Guide)
       const ratio = e.hp / e.maxHp;
-      const chance = ratio < 0.5 ? 0.85 : 0.4;
+      const chance = ratio < 0.55 ? 0.9 : 0.45;
       if (Math.random() < chance) {
-        if (!state.player.captured.includes(e.id)) {
-          state.player.captured.push(e.id);
-          saveProgress();
+        if (!state.player.capturedSpirits.includes(e.id)) {
+          state.player.capturedSpirits.push(e.id);
+          saveGame();
           updateHud();
         }
-        playSfx(880, 0.2);
-        b.msg = `Gotcha! ${e.name} was logged in your SALEM FIELD GUIDE!`;
+        playSfx(880, 0.18);
+        b.msg = `IRON AMULET resonated! ${e.name} pacified & logged!`;
         b.phase = 'MSG';
         b.nextPhase = 'END';
       } else {
-        b.msg = `Too stubborn! Lower their EGO with LORE first!`;
+        b.msg = `${e.name} resisted the Iron Amulet! Use SEA SALT first!`;
         b.phase = 'MSG';
         b.nextPhase = 'ENEMY_TURN';
       }
-    } else if (choice === 2) {
-      // CIDER DONUT HEAL
+    } else if (idx === 2) {
+      // CIDER DONUT
       if (state.player.donuts > 0) {
         state.player.donuts--;
-        state.player.hp = Math.min(state.player.maxHp, state.player.hp + 20);
+        state.player.hp = Math.min(state.player.maxHp, state.player.hp + 25);
         playSfx(740, 0.12);
-        b.msg = `Ate a warm Cider Donut! Restored 20 SANITY! (${state.player.donuts} left)`;
+        b.msg = `Ate a warm Cider Donut! +25 SANITY (${state.player.donuts} left).`;
         b.phase = 'MSG';
         b.nextPhase = 'ENEMY_TURN';
       } else {
-        b.msg = `Out of Cider Donuts! Go pet BEANS on Essex St to heal!`;
+        b.msg = `No Cider Donuts left! Visit BEANS on Essex St to restock!`;
         b.phase = 'MSG';
         b.nextPhase = 'MENU';
       }
-    } else if (choice === 3) {
-      // DUCK INTO ALLEYS (RUN)
-      playSfx(300, 0.1);
-      b.msg = `Ducked down Derby Square alley and lost them!`;
+    } else if (idx === 3) {
+      // DUCK INTO DERBY ALLEY
+      playSfx(310, 0.09);
+      b.msg = `Cut through a historic brick alleyway and escaped!`;
       b.phase = 'MSG';
       b.nextPhase = 'END';
     }
@@ -738,26 +932,44 @@
     const move = e.moves[Math.floor(Math.random() * e.moves.length)];
     const dmg = Math.max(2, e.atk - 2 + Math.floor(Math.random() * 4));
     state.player.hp = Math.max(1, state.player.hp - dmg);
-    playSfx(180, 0.12, 'sawtooth');
-    b.msg = `${e.name} used ${move}! You lost ${dmg} SANITY!`;
+    playSfx(175, 0.12, 'sawtooth');
+    b.msg = `${e.name} used ${move}! -${dmg} SANITY!`;
     b.phase = 'MSG';
     b.nextPhase = 'MENU';
   }
 
-  // --- INPUT CONTROLLER ---
+  // --- INPUT HANDLER ---
   function onInput(key) {
-    vibrate(15);
+    vibrate(12);
 
-    if (key === 'SELECT') {
-      toggleSound();
+    if (state.mode === 'TITLE') {
+      if (key === 'A' || key === 'START' || key === 'SELECT') {
+        state.mode = 'EXPLORE';
+        updateHud();
+        playSfx(587.33, 0.1);
+      }
       return;
     }
 
-    if (state.mode === 'TITLE') {
-      if (key === 'A' || key === 'START') {
+    // Toggle GPS Minimap with SELECT
+    if (key === 'SELECT') {
+      state.mode = (state.mode === 'MINIMAP') ? 'EXPLORE' : 'MINIMAP';
+      playSfx(680, 0.06);
+      return;
+    }
+
+    if (state.mode === 'MINIMAP') {
+      if (key === 'A' || key === 'B' || key === 'START') {
         state.mode = 'EXPLORE';
-        playSfx(587.33, 0.1);
-        updateHud();
+      }
+      return;
+    }
+
+    if (state.mode === 'GUIDE') {
+      if (key === 'A') {
+        toggleSound();
+      } else if (key === 'B' || key === 'START') {
+        state.mode = 'EXPLORE';
       }
       return;
     }
@@ -768,16 +980,7 @@
         playSfx(520, 0.05);
         if (state.dialogQueue.length === 0) {
           state.mode = 'EXPLORE';
-          if (state.dialogCallback) state.dialogCallback();
         }
-      }
-      return;
-    }
-
-    if (state.mode === 'MENU') {
-      if (key === 'B' || key === 'START') {
-        state.mode = 'EXPLORE';
-        playSfx(400, 0.05);
       }
       return;
     }
@@ -786,17 +989,15 @@
       const b = state.battle;
       if (b.phase === 'INTRO' || b.phase === 'MSG') {
         if (key === 'A' || key === 'B') {
-          if (b.nextPhase === 'MENU') {
-            b.phase = 'MENU';
-          } else if (b.nextPhase === 'ENEMY_TURN') {
-            enemyTurn();
-          } else if (b.nextPhase === 'WIN') {
-            if (!state.player.captured.includes(b.enemy.id)) {
-              state.player.captured.push(b.enemy.id);
-              saveProgress();
+          if (b.nextPhase === 'MENU') b.phase = 'MENU';
+          else if (b.nextPhase === 'ENEMY_TURN') enemyTurn();
+          else if (b.nextPhase === 'WIN') {
+            if (!state.player.capturedSpirits.includes(b.enemy.id)) {
+              state.player.capturedSpirits.push(b.enemy.id);
+              saveGame();
               updateHud();
             }
-            b.msg = `${b.enemy.name} cleared the sidewalk! Logged in Field Guide!`;
+            b.msg = `${b.enemy.name} cleared the way! Added to Spirit Log!`;
             b.nextPhase = 'END';
           } else if (b.nextPhase === 'END') {
             state.mode = 'EXPLORE';
@@ -809,18 +1010,17 @@
         if (key === 'RIGHT' && b.cursor % 2 === 0) b.cursor++;
         if (key === 'UP' && b.cursor >= 2) b.cursor -= 2;
         if (key === 'DOWN' && b.cursor < 2) b.cursor += 2;
-        if (key === 'A') handleBattleAction(b.cursor);
+        if (key === 'A') handleBattleChoice(b.cursor);
       }
       return;
     }
 
     if (state.mode === 'EXPLORE') {
       if (key === 'START') {
-        state.mode = 'MENU';
-        playSfx(620, 0.07);
+        state.mode = 'GUIDE';
+        playSfx(620, 0.06);
         return;
       }
-
       if (key === 'A') {
         interactFront();
         return;
@@ -842,13 +1042,12 @@
           playSfx(140, 0.02, 'triangle');
           updateHud();
 
-          // Check tall leaves / graveyard grass for encounters
-          const tile = WORLD_MAP[ny][nx];
-          if (tile === 5 && Math.random() < 0.24) {
+          // Wild encounter check in cemetery grass / autumn leaves
+          if (WORLD_MAP[ny][nx] === 5 && Math.random() < 0.14) {
             startBattle();
           }
         } else {
-          playSfx(95, 0.04, 'sawtooth');
+          playSfx(90, 0.03, 'sawtooth');
         }
       }
     }
@@ -857,9 +1056,7 @@
   function canWalk(x, y) {
     if (x < 0 || x >= MAP_W || y < 0 || y >= MAP_H) return false;
     const t = WORLD_MAP[y][x];
-    // Walkable tiles: 0 (pavement), 1 (Essex brick), 5 (leaves/grass), 7 (Derby Wharf wood)
     if (![0, 1, 5, 7].includes(t)) return false;
-    // Check NPC collision
     for (const npc of NPCS) {
       if (npc.x === x && npc.y === y) return false;
     }
@@ -874,7 +1071,7 @@
     if (state.player.dir === 'LEFT') tx--;
     if (state.player.dir === 'RIGHT') tx++;
 
-    // Check NPC
+    // 1. Check NPC
     const npc = NPCS.find(n => n.x === tx && n.y === ty);
     if (npc) {
       if (npc.heal) {
@@ -885,33 +1082,51 @@
       return;
     }
 
-    // Check Landmarks & Shop Signs
-    const signKey = `${tx},${ty}`;
-    if (SIGNS[signKey]) {
-      startDialog([SIGNS[signKey]]);
+    // 2. Check Verified Historical Landmark Plaque
+    const coordKey = `${tx},${ty}`;
+    if (LANDMARK_COORDS[coordKey]) {
+      const lm = LANDMARKS[LANDMARK_COORDS[coordKey]];
+      const isNew = !state.player.visitedLandmarks.includes(lm.id);
+      if (isNew) {
+        state.player.visitedLandmarks.push(lm.id);
+        saveGame();
+        updateHud();
+        playSfx(880, 0.18);
+      }
+      startDialog([
+        lm.desc,
+        isNew
+          ? `★ STAMPED IN TOUR GUIDE! (${state.player.visitedLandmarks.length}/15 Landmarks Visited)`
+          : `✓ Already stamped in your Salem Walking Tour Guide.`
+      ]);
       return;
     }
 
-    // Generic Gravestones
-    if (WORLD_MAP[ty] && WORLD_MAP[ty][tx] === 8) {
-      startDialog(['OLD CHARTER ST TOMBSTONE: Carved with a winged skull and 1688 inscription.']);
+    // 3. Check Derby Wharf Lighthouse or Cemetery Stones
+    const tile = WORLD_MAP[ty] && WORLD_MAP[ty][tx];
+    if (tile === 8) {
+      if (ty >= 50) {
+        startDialog(['DERBY WHARF LIGHT STATION (1871): Historic white square lighthouse marking the end of Derby Wharf.']);
+      } else {
+        startDialog(['COLONIAL SLATE HEADSTONE: Carved with a winged death\'s head skull and hourglass.']);
+      }
+    } else if (tile === 2) {
+      startDialog(['HISTORIC SALEM SHOPFRONT: The window is full of tarot decks, black candles, and witch hats.']);
     }
   }
 
-  // --- PIXEL ART RENDERING (160x144 Native GBC) ---
+  // --- DRAWING FUNCTIONS ---
   function drawTile(tx, ty, sx, sy) {
     const t = WORLD_MAP[ty][tx];
-    // Base ground fill
     ctx.fillStyle = PAL.PAVE;
     ctx.fillRect(sx, sy, 16, 16);
 
     if (t === 0) {
-      // Cobblestone sidewalk
       ctx.fillStyle = PAL.PAVE_DARK;
-      ctx.fillRect(sx + 3, sy + 3, 2, 2);
-      ctx.fillRect(sx + 11, sy + 10, 2, 2);
+      ctx.fillRect(sx + 3, sy + 4, 2, 2);
+      ctx.fillRect(sx + 11, sy + 11, 2, 2);
     } else if (t === 1) {
-      // Essex St Red Brick Pedestrian Mall
+      // Essex St Red Brick Mall
       ctx.fillStyle = PAL.BRICK;
       ctx.fillRect(sx, sy, 16, 16);
       ctx.fillStyle = PAL.BRICK_HI;
@@ -920,23 +1135,23 @@
       ctx.fillRect(sx + 2, sy + 9, 6, 3);
       ctx.fillRect(sx + 8, sy + 13, 6, 2);
     } else if (t === 2) {
-      // Colonial Clapboard Wall + Window
+      // Historic Building Facade
       ctx.fillStyle = PAL.WALL_TAN;
       ctx.fillRect(sx, sy, 16, 16);
       ctx.fillStyle = PAL.INK;
       ctx.fillRect(sx, sy + 14, 16, 2);
-      ctx.fillRect(sx + 4, sy + 4, 8, 8);
+      ctx.fillRect(sx + 4, sy + 3, 8, 8);
       ctx.fillStyle = PAL.GOLD;
-      ctx.fillRect(sx + 5, sy + 5, 6, 6);
+      ctx.fillRect(sx + 5, sy + 4, 6, 6);
     } else if (t === 3) {
-      // Gabled Salem Roof
+      // Slate Gabled Roof
       ctx.fillStyle = PAL.ROOF_PURP;
       ctx.fillRect(sx, sy, 16, 16);
       ctx.fillStyle = PAL.INK;
       ctx.fillRect(sx, sy + 7, 16, 1);
       ctx.fillRect(sx, sy + 15, 16, 1);
     } else if (t === 4) {
-      // Autumn Tree (Orange/Gold Foliage)
+      // Autumn Tree
       ctx.fillStyle = PAL.INK;
       ctx.fillRect(sx + 6, sy + 11, 4, 5);
       ctx.fillStyle = PAL.LEAF_ORG;
@@ -944,22 +1159,22 @@
       ctx.fillStyle = PAL.LEAF_YEL;
       ctx.fillRect(sx + 4, sy + 3, 6, 5);
     } else if (t === 5) {
-      // Haunted Graveyard Grass + Crunchy Autumn Leaves
+      // Grass + October Leaves
       ctx.fillStyle = PAL.GRASS;
       ctx.fillRect(sx, sy, 16, 16);
       ctx.fillStyle = PAL.LEAF_ORG;
       ctx.fillRect(sx + 2, sy + 3, 3, 3);
-      ctx.fillRect(sx + 10, sy + 9, 4, 3);
+      ctx.fillRect(sx + 11, sy + 10, 3, 3);
       ctx.fillStyle = PAL.LEAF_YEL;
-      ctx.fillRect(sx + 6, sy + 12, 3, 2);
+      ctx.fillRect(sx + 7, sy + 12, 2, 2);
     } else if (t === 6) {
       // Salem Harbor Water
       ctx.fillStyle = PAL.WATER;
       ctx.fillRect(sx, sy, 16, 16);
-      const waveShift = (Math.floor(state.animTick / 20) + tx) % 2 === 0 ? 2 : 0;
+      const shift = (Math.floor(state.animTick / 20) + tx) % 2 === 0 ? 2 : 0;
       ctx.fillStyle = PAL.WATER_HI;
-      ctx.fillRect(sx + 2 + waveShift, sy + 5, 6, 2);
-      ctx.fillRect(sx + 7 - waveShift, sy + 12, 5, 2);
+      ctx.fillRect(sx + 2 + shift, sy + 5, 6, 2);
+      ctx.fillRect(sx + 7 - shift, sy + 12, 5, 2);
     } else if (t === 7) {
       // Derby Wharf Planks
       ctx.fillStyle = PAL.WOOD;
@@ -969,70 +1184,69 @@
       ctx.fillRect(sx + 1, sy + 6, 14, 3);
       ctx.fillRect(sx + 1, sy + 11, 14, 3);
     } else if (t === 8) {
-      // Gravestone or Bewitched Statue
-      ctx.fillStyle = (ty === 6) ? PAL.BRICK : PAL.GRASS;
+      // Headstone or Derby Light
+      ctx.fillStyle = ty >= 50 ? PAL.WOOD : PAL.GRASS;
       ctx.fillRect(sx, sy, 16, 16);
-      ctx.fillStyle = (ty === 6) ? PAL.GOLD : PAL.STONE;
-      ctx.fillRect(sx + 3, sy + 2, 10, 12);
+      ctx.fillStyle = ty >= 50 ? PAL.BG_CREAM : PAL.STONE;
+      ctx.fillRect(sx + 4, sy + 2, 8, 12);
       ctx.fillStyle = PAL.INK;
-      ctx.fillRect(sx + 5, sy + 5, 6, 2);
+      ctx.fillRect(sx + 6, sy + 5, 4, 2);
     } else if (t === 9) {
-      // Shop Door with Hanging Sign
+      // Gold Historic Plaque / Landmark Entrance
       ctx.fillStyle = PAL.WALL_TAN;
       ctx.fillRect(sx, sy, 16, 16);
       ctx.fillStyle = PAL.BRICK;
-      ctx.fillRect(sx + 4, sy + 3, 8, 13);
-      ctx.fillStyle = PAL.GOLD;
-      ctx.fillRect(sx + 9, sy + 9, 2, 2);
+      ctx.fillRect(sx + 3, sy + 2, 10, 14);
+      // Shimmering Gold Tour Plaque
+      ctx.fillStyle = (Math.floor(state.animTick / 15) % 2 === 0) ? PAL.GOLD : PAL.LEAF_ORG;
+      ctx.fillRect(sx + 5, sy + 5, 6, 5);
+    } else if (t === 10) {
+      // Ornate Iron Fence (Salem Common / Tunnel)
+      ctx.fillStyle = PAL.GRASS;
+      ctx.fillRect(sx, sy, 16, 16);
+      ctx.fillStyle = PAL.INK;
+      ctx.fillRect(sx, sy + 6, 16, 3);
+      ctx.fillRect(sx + 2, sy + 2, 2, 12);
+      ctx.fillRect(sx + 7, sy + 2, 2, 12);
+      ctx.fillRect(sx + 12, sy + 2, 2, 12);
     }
   }
 
   function drawSprite(sx, sy, type, step = 0) {
     if (type === 'player') {
-      // Black techwear/punk coat + dark hair
       ctx.fillStyle = PAL.INK;
       ctx.fillRect(sx + 3, sy + 1, 10, 14);
-      // Face
       ctx.fillStyle = PAL.BG_CREAM;
       ctx.fillRect(sx + 5, sy + 4, 6, 4);
-      // Eyes
       ctx.fillStyle = PAL.INK;
       ctx.fillRect(sx + 5, sy + 5, 2, 2);
       ctx.fillRect(sx + 9, sy + 5, 2, 2);
-      // Crimson scarf / collar accent
       ctx.fillStyle = PAL.BRICK_HI;
       ctx.fillRect(sx + 4, sy + 8, 8, 2);
-      // Boots step animation
       ctx.fillStyle = PAL.STONE;
       ctx.fillRect(sx + 4, sy + 14 + (step ? -1 : 0), 3, 2);
       ctx.fillRect(sx + 9, sy + 14 + (step ? 0 : -1), 3, 2);
     } else if (type === 'cat') {
-      // Tortoiseshell Cat (Beans)
       ctx.fillStyle = PAL.INK;
       ctx.fillRect(sx + 4, sy + 6, 8, 8);
-      // Ears
       ctx.fillRect(sx + 4, sy + 4, 2, 2);
       ctx.fillRect(sx + 10, sy + 4, 2, 2);
-      // Tortie Orange/Gold patches
       ctx.fillStyle = PAL.TORTIE_ORG;
       ctx.fillRect(sx + 5, sy + 6, 3, 3);
       ctx.fillRect(sx + 8, sy + 10, 3, 3);
-      // Glowing Gold Eyes
       ctx.fillStyle = PAL.GOLD;
       ctx.fillRect(sx + 5, sy + 8, 2, 2);
       ctx.fillRect(sx + 9, sy + 8, 2, 2);
     } else if (type === 'ghost') {
-      // Spectral Puritan / Giles Corey
       ctx.fillStyle = PAL.GHOST_CYAN;
       ctx.fillRect(sx + 3, sy + 2, 10, 12);
       ctx.fillStyle = PAL.INK;
       ctx.fillRect(sx + 5, sy + 5, 2, 3);
       ctx.fillRect(sx + 9, sy + 5, 2, 3);
     } else {
-      // Tourist in pointy witch hat
       ctx.fillStyle = PAL.INK;
-      ctx.fillRect(sx + 2, sy + 3, 12, 2); // Hat brim
-      ctx.fillRect(sx + 5, sy + 0, 6, 3);  // Hat cone
+      ctx.fillRect(sx + 2, sy + 3, 12, 2);
+      ctx.fillRect(sx + 5, sy + 0, 6, 3);
       ctx.fillStyle = PAL.BG_CREAM;
       ctx.fillRect(sx + 5, sy + 5, 6, 4);
       ctx.fillStyle = PAL.LEAF_ORG;
@@ -1040,8 +1254,105 @@
     }
   }
 
+  // --- GPS MINIMAP OVERLAY (SELECT BUTTON) ---
+  function renderMinimap() {
+    ctx.fillStyle = PAL.INK;
+    ctx.fillRect(0, 0, 160, 144);
+
+    // Draw 80x60 map scaled 2x horizontal, 2x vertical in center (160x120)
+    const offsetY = 14;
+    for (let y = 0; y < MAP_H; y++) {
+      for (let x = 0; x < MAP_W; x++) {
+        const t = WORLD_MAP[y][x];
+        let col = '#2a3828';
+        if (t === 0) col = '#908878';
+        else if (t === 1) col = '#d85038';
+        else if (t === 2 || t === 3) col = '#584078';
+        else if (t === 6) col = '#184080';
+        else if (t === 7) col = '#a07040';
+        else if (t === 9) col = PAL.GOLD;
+        ctx.fillStyle = col;
+        ctx.fillRect(x * 2, offsetY + y * 2, 2, 2);
+      }
+    }
+
+    // Blinking Gold Dots for Unvisited Landmarks, Green for Visited
+    for (const [coord, id] of Object.entries(LANDMARK_COORDS)) {
+      const [lx, ly] = coord.split(',').map(Number);
+      const visited = state.player.visitedLandmarks.includes(id);
+      ctx.fillStyle = visited ? PAL.HP_GREEN : PAL.GOLD;
+      ctx.fillRect(lx * 2 - 1, offsetY + ly * 2 - 1, 3, 3);
+    }
+
+    // Blinking Player GPS Dot
+    if (Math.floor(state.animTick / 10) % 2 === 0) {
+      ctx.fillStyle = '#ff2a2a';
+      ctx.fillRect(state.player.x * 2 - 2, offsetY + state.player.y * 2 - 2, 5, 5);
+    }
+
+    // Header Bar
+    ctx.fillStyle = PAL.INK;
+    ctx.fillRect(0, 0, 160, 14);
+    ctx.fillStyle = PAL.GOLD;
+    ctx.font = 'bold 8px monospace';
+    ctx.fillText(`GPS RADAR: ${getStreetName(state.player.x, state.player.y)}`, 4, 10);
+
+    // Footer Legend
+    ctx.fillStyle = PAL.INK;
+    ctx.fillRect(0, 134, 160, 10);
+    ctx.fillStyle = PAL.BG_CREAM;
+    ctx.fillText('RED:YOU  GOLD:PLAQUE  [SELECT]:EXIT', 4, 142);
+  }
+
+  // --- START MENU / WALKING TOUR CHECKLIST ---
+  function renderGuideMenu() {
+    ctx.fillStyle = PAL.BG_CREAM;
+    ctx.fillRect(6, 6, 148, 132);
+    ctx.strokeStyle = PAL.INK;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(8, 8, 144, 128);
+
+    ctx.fillStyle = PAL.INK;
+    ctx.font = 'bold 8px monospace';
+    ctx.fillText(`WALKING TOUR: ${state.player.visitedLandmarks.length}/15`, 14, 20);
+    ctx.fillText(`[A] SOUND: ${soundEnabled ? 'ON' : 'OFF'}`, 100, 20);
+
+    const keys = Object.keys(LANDMARKS);
+    keys.slice(0, 12).forEach((k, i) => {
+      const done = state.player.visitedLandmarks.includes(k);
+      const label = LANDMARKS[k].title.split(' (')[0].substring(0, 19);
+      ctx.fillStyle = done ? '#1e6b2b' : '#555';
+      ctx.fillText(`${done ? '★' : '·'}${label}`, 14, 32 + i * 8);
+    });
+    ctx.fillStyle = PAL.INK;
+    ctx.fillText('PRESS [SELECT] FOR FULL CITY MAP', 14, 131);
+  }
+
+  function drawTextBox(text) {
+    ctx.fillStyle = PAL.BG_CREAM;
+    ctx.fillRect(4, 92, 152, 48);
+    ctx.strokeStyle = PAL.INK;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(6, 94, 148, 44);
+
+    ctx.fillStyle = PAL.INK;
+    ctx.font = 'bold 8px monospace';
+    const words = text.split(' ');
+    let line = '';
+    let y = 106;
+    for (let w of words) {
+      if ((line + w).length > 22) {
+        ctx.fillText(line.trim(), 10, y);
+        line = w + ' ';
+        y += 9;
+      } else {
+        line += w + ' ';
+      }
+    }
+    if (line) ctx.fillText(line.trim(), 10, y);
+  }
+
   function renderExplore() {
-    // Camera centered on player (10x9 visible tiles on 160x144 screen)
     const camX = state.player.x - 4;
     const camY = state.player.y - 4;
 
@@ -1060,7 +1371,6 @@
       }
     }
 
-    // Draw NPCs in view
     for (const npc of NPCS) {
       const gx = npc.x - camX;
       const gy = npc.y - camY;
@@ -1069,60 +1379,13 @@
       }
     }
 
-    // Draw Player at center tile (4,4)
     drawSprite(4 * 16, 4 * 16, 'player', state.player.stepFrame);
 
-    // Draw Dialog Overlay if active
     if (state.mode === 'DIALOG' && state.dialogQueue.length > 0) {
       drawTextBox(state.dialogQueue[0]);
+    } else if (state.mode === 'GUIDE') {
+      renderGuideMenu();
     }
-
-    // Draw Start Menu Overlay if active
-    if (state.mode === 'MENU') {
-      ctx.fillStyle = PAL.BG_CREAM;
-      ctx.fillRect(16, 12, 128, 118);
-      ctx.strokeStyle = PAL.INK;
-      ctx.lineWidth = 2;
-      ctx.strokeRect(18, 14, 124, 114);
-
-      ctx.fillStyle = PAL.INK;
-      ctx.font = 'bold 9px monospace';
-      ctx.fillText('SALEM FIELD GUIDE', 26, 28);
-      ctx.fillText(`SANITY: ${state.player.hp}/${state.player.maxHp}`, 26, 42);
-      ctx.fillText(`CIDER DONUTS: ${state.player.donuts}`, 26, 54);
-      ctx.fillText('LOGGED SPIRITS:', 26, 70);
-
-      ENCOUNTERS.forEach((enc, i) => {
-        const caught = state.player.captured.includes(enc.id);
-        ctx.fillText(`${caught ? '★' : '·'} ${caught ? enc.name : '???????'}`, 28, 82 + i * 8);
-      });
-    }
-  }
-
-  function drawTextBox(text) {
-    ctx.fillStyle = PAL.BG_CREAM;
-    ctx.fillRect(4, 96, 152, 44);
-    ctx.strokeStyle = PAL.INK;
-    ctx.lineWidth = 2;
-    ctx.strokeRect(6, 98, 148, 40);
-
-    ctx.fillStyle = PAL.INK;
-    ctx.font = 'bold 8px monospace';
-
-    // Word wrap at ~22 chars
-    const words = text.split(' ');
-    let line = '';
-    let y = 110;
-    for (let w of words) {
-      if ((line + w).length > 22) {
-        ctx.fillText(line.trim(), 12, y);
-        line = w + ' ';
-        y += 10;
-      } else {
-        line += w + ' ';
-      }
-    }
-    if (line) ctx.fillText(line.trim(), 12, y);
   }
 
   function renderBattle() {
@@ -1132,19 +1395,16 @@
     ctx.fillStyle = PAL.BG_CREAM;
     ctx.fillRect(0, 0, 160, 144);
 
-    // Enemy Status Box (Top Left)
     ctx.fillStyle = PAL.INK;
     ctx.font = 'bold 8px monospace';
     ctx.fillText(`${e.name} :L${e.lvl}`, 8, 14);
-    // HP Bar
     ctx.fillRect(8, 18, 66, 6);
     const eRatio = Math.max(0, e.hp / e.maxHp);
     ctx.fillStyle = eRatio > 0.3 ? PAL.HP_GREEN : PAL.HP_RED;
     ctx.fillRect(9, 19, Math.floor(64 * eRatio), 4);
 
-    // Enemy Big Sprite (Top Right)
     const ex = 108, ey = 14;
-    ctx.fillStyle = e.sprite === 'ghost' ? PAL.GHOST_CYAN : PAL.LEAF_ORG;
+    ctx.fillStyle = e.type === 'ghost' ? PAL.GHOST_CYAN : PAL.LEAF_ORG;
     ctx.fillRect(ex, ey, 32, 32);
     ctx.strokeStyle = PAL.INK;
     ctx.strokeRect(ex, ey, 32, 32);
@@ -1153,13 +1413,11 @@
     ctx.fillRect(ex + 20, ey + 10, 6, 6);
     ctx.fillRect(ex + 8, ey + 22, 16, 4);
 
-    // Player Back Sprite (Bottom Left)
     ctx.fillStyle = PAL.INK;
     ctx.fillRect(14, 58, 28, 28);
     ctx.fillStyle = PAL.BRICK_HI;
     ctx.fillRect(16, 72, 24, 6);
 
-    // Player Status Box (Middle Right)
     ctx.fillStyle = PAL.INK;
     ctx.fillText(`LOCAL (YOU)`, 78, 66);
     ctx.fillText(`SANITY: ${state.player.hp}/${state.player.maxHp}`, 78, 78);
@@ -1168,19 +1426,18 @@
     ctx.fillStyle = pRatio > 0.3 ? PAL.HP_GREEN : PAL.HP_RED;
     ctx.fillRect(79, 83, Math.floor(64 * pRatio), 4);
 
-    // Bottom Battle Box
     if (b.phase === 'MENU') {
       ctx.fillStyle = PAL.BG_CREAM;
-      ctx.fillRect(4, 96, 152, 44);
+      ctx.fillRect(4, 94, 152, 46);
       ctx.strokeStyle = PAL.INK;
-      ctx.strokeRect(6, 98, 148, 40);
+      ctx.strokeRect(6, 96, 148, 42);
 
-      const opts = ['LORE DROP', 'SPIRIT LOG', 'DONUT', 'ALLEYS'];
+      const opts = ['SEA SALT', 'IRON AMULET', 'DONUT', 'ALLEYS'];
       ctx.fillStyle = PAL.INK;
       opts.forEach((opt, idx) => {
-        const ox = (idx % 2 === 0) ? 16 : 88;
-        const oy = (idx < 2) ? 114 : 128;
-        ctx.fillText(`${b.cursor === idx ? '▶' : ' '} ${opt}`, ox, oy);
+        const ox = (idx % 2 === 0) ? 12 : 82;
+        const oy = (idx < 2) ? 112 : 128;
+        ctx.fillText(`${b.cursor === idx ? '▶' : ' '}${opt}`, ox, oy);
       });
     } else {
       drawTextBox(b.msg);
@@ -1191,58 +1448,67 @@
     ctx.fillStyle = PAL.INK;
     ctx.fillRect(0, 0, 160, 144);
 
-    // Autumn Moon
     ctx.fillStyle = PAL.LEAF_YEL;
     ctx.beginPath();
-    ctx.arc(80, 46, 24, 0, Math.PI * 2);
+    ctx.arc(80, 44, 22, 0, Math.PI * 2);
     ctx.fill();
 
-    // Witch House Silhouette
     ctx.fillStyle = PAL.ROOF_PURP;
-    ctx.fillRect(46, 48, 68, 32);
+    ctx.fillRect(42, 46, 76, 30);
 
     ctx.fillStyle = PAL.BG_CREAM;
-    ctx.font = 'bold 12px monospace';
-    ctx.fillText('SALEM 1999', 42, 24);
+    ctx.font = 'bold 11px monospace';
+    ctx.fillText('SALEM 1998: GBC', 26, 22);
 
     ctx.fillStyle = PAL.GHOST_CYAN;
     ctx.font = 'bold 8px monospace';
-    ctx.fillText('POCKET WITCH CITY RPG', 26, 94);
+    ctx.fillText('HISTORIC WALKING TOUR RPG', 16, 90);
 
     ctx.fillStyle = PAL.LEAF_ORG;
-    ctx.fillText('ESSEX ST · DERBY WHARF', 24, 108);
+    ctx.fillText('80x60 REAL STREET GRID', 22, 104);
+    ctx.fillText('15 VERIFIED LANDMARKS', 24, 114);
 
     if (Math.floor(state.animTick / 25) % 2 === 0) {
       ctx.fillStyle = PAL.GOLD;
-      ctx.fillText('PRESS [A] OR START', 34, 130);
+      ctx.fillText('PRESS [A] TO START TOUR', 20, 132);
     }
   }
 
-  // --- MAIN RENDER LOOP ---
   function loop() {
     state.animTick++;
-    if (state.mode === 'TITLE') {
-      renderTitle();
-    } else if (state.mode === 'BATTLE') {
-      renderBattle();
-    } else {
-      renderExplore();
-    }
+    if (state.mode === 'TITLE') renderTitle();
+    else if (state.mode === 'MINIMAP') renderMinimap();
+    else if (state.mode === 'BATTLE') renderBattle();
+    else renderExplore();
     requestAnimationFrame(loop);
   }
   loop();
 
-  // --- BIND TOUCH & KEYBOARD CONTROLS ---
+  // --- CONTROLS BINDING (WITH HOLD-TO-WALK SUPPORT!) ---
+  let holdInterval = null;
+  function startHold(key) {
+    onInput(key);
+    if (['UP', 'DOWN', 'LEFT', 'RIGHT'].includes(key)) {
+      clearInterval(holdInterval);
+      holdInterval = setInterval(() => onInput(key), 135);
+    }
+  }
+  function stopHold() {
+    clearInterval(holdInterval);
+    holdInterval = null;
+  }
+
   document.querySelectorAll('[data-key]').forEach(btn => {
     const key = btn.getAttribute('data-key');
     const trigger = (e) => {
       e.preventDefault();
       btn.classList.add('pressed');
-      onInput(key);
+      startHold(key);
     };
     const release = (e) => {
       e.preventDefault();
       btn.classList.remove('pressed');
+      stopHold();
     };
     btn.addEventListener('touchstart', trigger, { passive: false });
     btn.addEventListener('touchend', release, { passive: false });
@@ -1252,6 +1518,7 @@
   });
 
   window.addEventListener('keydown', (e) => {
+    if (e.repeat) return;
     const map = {
       ArrowUp: 'UP', KeyW: 'UP',
       ArrowDown: 'DOWN', KeyS: 'DOWN',
@@ -1264,9 +1531,10 @@
     };
     if (map[e.code]) {
       e.preventDefault();
-      onInput(map[e.code]);
+      startHold(map[e.code]);
     }
   });
+  window.addEventListener('keyup', stopHold);
 })();
 </script>
 </body>
