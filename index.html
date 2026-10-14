@@ -1,613 +1,1273 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Salem 1998: Spirit Journey</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: none;
-    }
-    body {
-      background: #121312;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100dvh;
-      font-family: monospace;
-      padding: 6px;
-    }
-    #gameboy {
-      background: #879166;
-      border: 4px solid #232b14;
-      border-radius: 12px 12px 28px 12px;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      box-shadow: 0 6px 0 #141a0b;
-      width: 100%;
-      max-width: 320px;
-    }
-    #screen-housing {
-      background: #3e462d;
-      padding: 10px 10px 6px 10px;
-      border-radius: 6px;
-      border: 3px solid #232b14;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-    canvas {
-      background: #9bbc0f;
-      display: block;
-      image-rendering: pixelated;
-      border: 3px solid #0f380f;
-      width: 256px;
-      height: 230px;
-    }
-    #hud {
-      color: #9bbc0f;
-      font-size: 10px;
-      font-weight: bold;
-      margin-top: 5px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      text-align: center;
-    }
-    #controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 100%;
-      margin-top: 12px;
-      padding: 0 6px;
-    }
-    #dpad {
-      display: grid;
-      grid-template-columns: repeat(3, 38px);
-      grid-template-rows: repeat(3, 38px);
-      gap: 2px;
-    }
-    .d-btn {
-      background: #232b14;
-      border: 2px solid #141a0b;
-      border-radius: 3px;
-      color: #879166;
-      font-weight: bold;
-      font-size: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .d-btn:active {
-      background: #0f380f;
-    }
-    #action-btns {
-      display: flex;
-      gap: 10px;
-      transform: rotate(-14deg);
-    }
-    .act-btn {
-      background: #731e31;
-      border: 2px solid #360f18;
-      border-radius: 50%;
-      width: 44px;
-      height: 44px;
-      color: #f7b2c0;
-      font-weight: bold;
-      font-size: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 0 #1b070c;
-    }
-    .act-btn:active {
-      background: #40121d;
-      transform: translateY(2px);
-      box-shadow: 0 2px 0 #1b070c;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#2b1b3d">
+<title>SALEM '99: GBC Edition</title>
+<style>
+  * {
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    margin: 0;
+    padding: 0;
+  }
+  html, body {
+    width: 100%;
+    height: 100%;
+    background-color: #120a1c;
+    font-family: 'Courier New', Courier, monospace;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  /* Atomic Purple / Midnight Grape GBC Shell */
+  .gbc-shell {
+    width: 100%;
+    max-width: 430px;
+    height: 100dvh;
+    max-height: 880px;
+    background: linear-gradient(145deg, #3b2354 0%, #241436 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px 20px 16px;
+    border-radius: 18px 18px 42px 18px;
+    box-shadow: inset 0 0 12px rgba(255,255,255,0.12), 0 12px 35px rgba(0,0,0,0.8);
+    position: relative;
+  }
+  /* Screen Lens Bezel */
+  .screen-bezel {
+    width: 100%;
+    background: #191921;
+    border-radius: 12px 12px 28px 12px;
+    padding: 14px 18px 20px 18px;
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.9), 0 2px 2px rgba(255,255,255,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+  .bezel-top {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: 10px;
+    color: #888;
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+  .power-led {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .led-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ff2a2a;
+    box-shadow: 0 0 6px #ff2a2a;
+  }
+  .canvas-wrap {
+    width: 100%;
+    aspect-ratio: 10 / 9;
+    background: #f8f0d8;
+    border: 3px solid #0a0a0f;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  canvas {
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    display: block;
+  }
+  .gbc-logo {
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 900;
+    font-style: italic;
+    letter-spacing: 1.5px;
+    color: #b8b8c8;
+  }
+  .gbc-logo span.c1 { color: #ff3b56; }
+  .gbc-logo span.c2 { color: #a855f7; }
+  .gbc-logo span.c3 { color: #22c55e; }
+  .gbc-logo span.c4 { color: #eab308; }
+  .gbc-logo span.c5 { color: #3b82f6; }
+
+  /* HUD strip under bezel */
+  .hud-strip {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 8px;
+    font-size: 11px;
+    color: #c4b5fd;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 6px;
+    margin-top: 4px;
+  }
+
+  /* Controls Area */
+  .controls-area {
+    width: 100%;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding-top: 6px;
+  }
+  .main-pad-row {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 8px;
+  }
+
+  /* Cross D-Pad */
+  .dpad {
+    position: relative;
+    width: 132px;
+    height: 132px;
+  }
+  .dpad-btn {
+    position: absolute;
+    background: #1e1e26;
+    border: 2px solid #101015;
+    box-shadow: 0 4px 0 #09090c;
+    color: #666;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .dpad-btn:active, .dpad-btn.pressed {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #09090c;
+    background: #2c2c38;
+    color: #fff;
+  }
+  .dpad-up { top: 0; left: 44px; width: 44px; height: 46px; border-radius: 6px 6px 0 0; }
+  .dpad-down { bottom: 0; left: 44px; width: 44px; height: 46px; border-radius: 0 0 6px 6px; }
+  .dpad-left { top: 44px; left: 0; width: 46px; height: 44px; border-radius: 6px 0 0 6px; }
+  .dpad-right { top: 44px; right: 0; width: 46px; height: 44px; border-radius: 0 6px 6px 0; }
+  .dpad-center {
+    position: absolute;
+    top: 44px;
+    left: 44px;
+    width: 44px;
+    height: 44px;
+    background: #1e1e26;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .dpad-center::after {
+    content: '';
+    display: block;
+    width: 22px;
+    height: 22px;
+    margin: 11px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #14141a 20%, #252530 100%);
+  }
+
+  /* A / B Action Buttons */
+  .ab-cluster {
+    display: flex;
+    gap: 18px;
+    transform: rotate(-24deg);
+    background: rgba(0,0,0,0.18);
+    padding: 12px 18px;
+    border-radius: 40px;
+  }
+  .ab-btn-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .ab-btn {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #ff3b6b, #b80f3a);
+    border: 2px solid #5a061c;
+    box-shadow: 0 5px 0 #3d0312, 0 6px 10px rgba(0,0,0,0.6);
+    color: rgba(255,255,255,0.85);
+    font-weight: 900;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .ab-btn:active, .ab-btn.pressed {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 #3d0312;
+  }
+  .ab-label {
+    margin-top: 6px;
+    font-weight: 900;
+    font-size: 12px;
+    color: #a78bfa;
+    letter-spacing: 1px;
+  }
+
+  /* Start / Select Row */
+  .meta-row {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin-top: 6px;
+  }
+  .pill-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .pill-btn {
+    width: 48px;
+    height: 14px;
+    background: #252530;
+    border: 2px solid #101016;
+    border-radius: 10px;
+    box-shadow: 0 2px 0 #08080c;
+    transform: rotate(-24deg);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+  .pill-btn:active {
+    transform: rotate(-24deg) translateY(2px);
+    box-shadow: none;
+  }
+  .pill-label {
+    margin-top: 8px;
+    font-size: 10px;
+    font-weight: bold;
+    color: #9ca3af;
+    letter-spacing: 1px;
+  }
+</style>
 </head>
 <body>
 
-  <div id="gameboy">
-    <div id="screen-housing">
-      <canvas id="screen" width="160" height="144"></canvas>
-      <div id="hud">SALEM: ESSEX MALL</div>
+<div class="gbc-shell">
+  <!-- Top Screen Area -->
+  <div class="screen-bezel">
+    <div class="bezel-top">
+      <div class="power-led">
+        <div class="led-dot" id="ledDot"></div>
+        <span>BATTERY</span>
+      </div>
+      <span>SALEM Witch City '99</span>
     </div>
-
-    <div id="controls">
-      <div id="dpad">
-        <div></div>
-        <button class="d-btn" id="btn-up">▲</button>
-        <div></div>
-        <button class="d-btn" id="btn-left">◀</button>
-        <button class="d-btn" id="btn-mid" style="background:#2d371a;">●</button>
-        <button class="d-btn" id="btn-right">▶</button>
-        <div></div>
-        <button class="d-btn" id="btn-down">▼</button>
-        <div></div>
-      </div>
-
-      <div id="action-btns">
-        <button class="act-btn" id="btn-b">B</button>
-        <button class="act-btn" id="btn-a">A</button>
-      </div>
+    <div class="canvas-wrap">
+      <!-- Native GBC resolution 160x144 scaled up cleanly -->
+      <canvas id="gbcCanvas" width="160" height="144"></canvas>
+    </div>
+    <div class="gbc-logo">
+      GAME BOY <span class="c1">C</span><span class="c2">O</span><span class="c3">L</span><span class="c4">O</span><span class="c5">R</span>
     </div>
   </div>
 
-  <script>
-    const canvas = document.getElementById('screen');
-    const ctx = canvas.getContext('2d');
-    const hud = document.getElementById('hud');
+  <!-- Quick Status Strip -->
+  <div class="hud-strip">
+    <span id="zoneLabel">LOC: ESSEX ST MALL</span>
+    <span id="logLabel">SPIRIT LOG: 0/6</span>
+    <span id="soundLabel">SND: OFF</span>
+  </div>
 
-    const C = {
-      L0: '#9bbc0f', // Lightest Green
-      L1: '#8bac0f', // Light Green
-      L2: '#306230', // Dark Green
-      L3: '#0f380f'  // Deep Dark
-    };
+  <!-- Touch Controls -->
+  <div class="controls-area">
+    <div class="main-pad-row">
+      <div class="dpad">
+        <div class="dpad-btn dpad-up" data-key="UP">▲</div>
+        <div class="dpad-btn dpad-down" data-key="DOWN">▼</div>
+        <div class="dpad-btn dpad-left" data-key="LEFT">◀</div>
+        <div class="dpad-btn dpad-right" data-key="RIGHT">▶</div>
+        <div class="dpad-center"></div>
+      </div>
 
-    // Resilient Audio Engine (Zero impact on game loop if audio fails)
-    let audioCtx = null;
-    function playBeep(freq, type, duration) {
-      try {
-        if (!audioCtx) {
-          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-          if (AudioContextClass) audioCtx = new AudioContextClass();
-        }
-        if (audioCtx && audioCtx.state === 'suspended') {
-          audioCtx.resume();
-        }
-        if (audioCtx) {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.type = type || 'triangle';
-          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-          gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-          gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + duration);
-          osc.start();
-          osc.stop(audioCtx.currentTime + duration);
-        }
-      } catch (err) {
-        // Audio error caught silently without halting execution
-      }
+      <div class="ab-cluster">
+        <div class="ab-btn-wrap">
+          <div class="ab-btn" data-key="B">B</div>
+          <div class="ab-label">B</div>
+        </div>
+        <div class="ab-btn-wrap">
+          <div class="ab-btn" data-key="A">A</div>
+          <div class="ab-label">A</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="meta-row">
+      <div class="pill-wrap">
+        <div class="pill-btn" data-key="SELECT"></div>
+        <div class="pill-label">SOUND</div>
+      </div>
+      <div class="pill-wrap">
+        <div class="pill-btn" data-key="START"></div>
+        <div class="pill-label">MENU / SAVE</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('gbcCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+
+  // --- GBC 56-COLOR AUTUMN PALETTE ---
+  const PAL = {
+    BG_CREAM: '#f8f0d8',
+    INK: '#181020',
+    BRICK: '#b84030',
+    BRICK_HI: '#d86850',
+    PAVE: '#c8c0b0',
+    PAVE_DARK: '#908878',
+    GRASS: '#508840',
+    LEAF_ORG: '#e87820',
+    LEAF_YEL: '#f8b830',
+    WATER: '#2858a8',
+    WATER_HI: '#5890e0',
+    WOOD: '#885830',
+    WOOD_HI: '#b07848',
+    ROOF_PURP: '#483068',
+    ROOF_RED: '#882828',
+    WALL_TAN: '#e0d0b0',
+    WALL_DARK: '#383040',
+    STONE: '#889098',
+    GOLD: '#f8c830',
+    GHOST_CYAN: '#78e8d8',
+    TORTIE_ORG: '#d87028',
+    HP_GREEN: '#38b848',
+    HP_RED: '#d83030'
+  };
+
+  // --- AUDIO SYNTHESIZER (8-Bit Web Audio) ---
+  let audioCtx = null;
+  let soundEnabled = false;
+  let bgmTimer = null;
+  let noteIdx = 0;
+
+  // Spooky GBC Chiptune Loop (D minor / Phrygian vibe)
+  const TOWN_NOTES = [293.66, 349.23, 440.00, 349.23, 329.63, 293.66, 261.63, 220.00];
+  const BATTLE_NOTES = [392.00, 415.30, 392.00, 329.63, 466.16, 440.00, 392.00, 311.13];
+
+  function toggleSound() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
+    soundEnabled = !soundEnabled;
+    document.getElementById('soundLabel').textContent = `SND: ${soundEnabled ? 'ON' : 'OFF'}`;
+    if (soundEnabled) {
+      playSfx(660, 0.08, 'square');
+      startBgm();
+    } else {
+      stopBgm();
+    }
+  }
 
-    // World Maps
-    const maps = {
-      downtown: [
-        [3, 3, 0, 0, 1, 1, 5, 1, 3, 3],
-        [3, 3, 0, 0, 1, 5, 1, 1, 3, 3],
-        [0, 0, 0, 0, 1, 1, 1, 1, 0, 0],
-        [4, 4, 0, 0, 0, 0, 0, 0, 0, 0],
-        [4, 4, 0, 0, 3, 3, 0, 0, 3, 3],
-        [0, 0, 0, 0, 3, 3, 0, 0, 3, 3],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-      ],
-      waterfront: [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
-        [6, 6, 6, 6, 6, 6, 6, 6, 6, 6],
-        [2, 2, 6, 6, 2, 2, 2, 2, 2, 2],
-        [2, 2, 6, 6, 2, 2, 2, 2, 2, 2],
-        [2, 2, 6, 6, 2, 2, 2, 2, 2, 2],
-        [2, 2, 3, 3, 2, 2, 2, 2, 2, 2]
-      ]
-    };
-
-    // State Variables with Safe Fallback
-    let currentZone = 'downtown';
-    let player = { x: 4, y: 2, dir: 'down', step: 0, hp: 20, maxHp: 20 };
-    let inventory = ["Cider Donut", "Sea Salt", "Iron Amulet"];
-    let mode = 'EXPLORE'; // 'EXPLORE' | 'BATTLE'
-    let message = "Salem, Oct 1998. Explore!";
-    let battleMenuIdx = 0;
-    let currentEnemy = null;
-
+  function playSfx(freq, dur = 0.08, type = 'square') {
+    if (!soundEnabled || !audioCtx) return;
     try {
-      const z = localStorage.getItem('salem_zone');
-      if (z && maps[z]) currentZone = z;
-      const p = JSON.parse(localStorage.getItem('salem_player'));
-      if (p && typeof p.x === 'number') player = { ...player, ...p };
-      const inv = JSON.parse(localStorage.getItem('salem_inv'));
-      if (Array.isArray(inv)) inventory = inv;
-    } catch (e) {
-      // Fallback cleanly to default state
-    }
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + dur);
+    } catch (e) {}
+  }
 
-    const npcs = {
-      downtown: {
-        "1,4": { name: "Giles Corey", hp: 30, maxHp: 30, text: "GILES: More weight! Appease me?", sprite: "ghost", reward: "Stone Shard" },
-        "6,1": { name: "Juliette", hp: 15, maxHp: 15, text: "BEANS: *Purrs softly from the void*", sprite: "cat", reward: "Void Whisker" },
-        "8,3": { name: "Essex Witch", hp: 25, maxHp: 25, text: "WITCH: The veil thins on Essex St.", sprite: "witch", reward: "Broom Twig" }
-      },
-      waterfront: {
-        "3,5": { name: "Derby Ghost", hp: 25, maxHp: 25, text: "HAWTHORNE: The Custom House sleeps!", sprite: "ghost", reward: "Quill Pen" }
+  function startBgm() {
+    stopBgm();
+    if (!soundEnabled) return;
+    bgmTimer = setInterval(() => {
+      if (!soundEnabled) return;
+      const list = state.mode === 'BATTLE' ? BATTLE_NOTES : TOWN_NOTES;
+      const f = list[noteIdx % list.length];
+      playSfx(f, state.mode === 'BATTLE' ? 0.12 : 0.22, 'triangle');
+      noteIdx++;
+    }, state.mode === 'BATTLE' ? 160 : 320);
+  }
+
+  function stopBgm() {
+    if (bgmTimer) clearInterval(bgmTimer);
+    bgmTimer = null;
+  }
+
+  function vibrate(ms = 18) {
+    if (navigator.vibrate) navigator.vibrate(ms);
+  }
+
+  // --- MAP DEFINITION (24x20 Downtown Salem Grid) ---
+  // Legend:
+  // 0: Sidewalk/Pavement
+  // 1: Essex St Red Brick Mall
+  // 2: Building Wall (Solid)
+  // 3: Dark Roof / Witch House (Solid)
+  // 4: Autumn Tree (Solid)
+  // 5: Tall Leaves / Cemetery Grass (Triggers Wild Encounters!)
+  // 6: Salem Harbor Water (Solid)
+  // 7: Derby Wharf Wood Plank (Walkable)
+  // 8: Gravestone / Monument (Solid / Interactable)
+  // 9: Shop Door / Sign (Solid / Interactable)
+  const MAP_W = 24;
+  const MAP_H = 20;
+  const WORLD_MAP = [
+    [4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],
+    [4,3,3,3,3,4,0,0,0,5,5,4,4,3,3,3,3,3,4,5,5,5,4,4],
+    [4,2,2,9,2,4,0,8,0,5,5,0,0,2,2,9,2,2,4,5,8,5,5,4],
+    [4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5,5,4],
+    [4,0,3,3,3,0,0,3,3,3,3,0,0,3,3,3,3,0,0,4,0,0,0,4],
+    [4,0,2,9,2,0,0,2,9,2,2,0,0,2,9,2,2,0,0,4,3,3,3,4],
+    [4,1,1,1,1,1,1,1,1,1,1,8,1,1,1,1,1,1,1,1,2,9,2,4],
+    [4,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,4],
+    [4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4],
+    [4,5,5,5,0,0,4,4,8,8,8,8,8,4,4,0,0,3,3,3,0,5,5,4],
+    [4,5,8,5,0,0,4,5,5,8,5,8,5,5,4,0,0,2,9,2,0,5,5,4],
+    [4,5,5,5,0,0,4,5,8,5,5,5,8,5,4,0,0,0,0,0,0,5,5,4],
+    [4,0,0,0,0,0,0,0,0,5,5,0,0,0,0,0,0,0,0,0,0,0,0,4],
+    [4,0,3,3,3,0,0,0,0,0,0,0,0,0,3,3,3,3,0,0,4,4,4,4],
+    [4,0,2,9,2,0,0,0,0,0,0,0,0,0,2,2,9,2,0,0,0,0,0,4],
+    [4,0,0,0,0,0,0,0,0,7,7,7,0,0,0,0,0,0,0,0,0,0,0,4],
+    [6,6,6,6,6,6,6,6,6,7,7,7,6,6,6,6,6,6,6,6,6,6,6,6],
+    [6,6,6,6,6,6,6,6,6,7,7,7,6,6,6,6,6,6,6,6,6,6,6,6],
+    [6,6,6,6,6,6,6,6,6,7,7,7,6,6,6,6,6,6,6,6,6,6,6,6],
+    [6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6]
+  ];
+
+  // Landmarks & Signs (Tile Coordinates)
+  const SIGNS = {
+    '3,2': 'THE WITCH HOUSE (1642): Solid dark timber and serious 17th-century goth energy.',
+    '15,2': 'ROPES MANSION: Lush gardens in the back, zero traffic cones out front.',
+    '3,5': 'ESSEX WITCH EMPORIUM: Smells like Nag Champa, patchouli, and bulk quartz crystals.',
+    '8,5': 'ROCKAFELLAS & GHOST TOURS: Tickets sold out until November 2nd.',
+    '14,5': 'PEABODY ESSEX MUSEUM: World-class art & Yin Yu Tang house inside.',
+    '11,6': 'BEWITCHED STATUE: Elizabeth Montgomery frozen in bronze mid-flight on Essex St!',
+    '21,6': 'HAWTHORNE HOTEL: Fancy ballroom, haunted elevators on the 6th floor.',
+    '3,14': 'SALEM WAX MUSEUM: Creepy wax Puritans staring into your soul since the 90s.',
+    '16,14': 'CUSTOM HOUSE (1819): A carved golden eagle watches over Derby Wharf.',
+    '18,10': 'CHARTER ST CEMETERY GATE: Oldest burying point in Salem (1637).'
+  };
+
+  // --- NPCs (Cats, Historical Icons, Confused Tourists) ---
+  const NPCS = [
+    {
+      id: 'beans',
+      name: 'BEANS (Tortie Cat)',
+      type: 'cat',
+      x: 10, y: 7,
+      dialog: [
+        'BEANS: *Mrrp.* (She judges your footwear from the brick pavement.)',
+        'BEANS: You scratched behind her ear! Your SANITY is fully restored!'
+      ],
+      heal: true
+    },
+    {
+      id: 'giles',
+      name: 'GILES COREY',
+      type: 'ghost',
+      x: 10, y: 11,
+      dialog: [
+        'GILES COREY: "More weight... Wait, is that an iced regular from Dunkin?"',
+        'GILES COREY: "Tell the tourists in the pointy velour hats to stay off my stones."'
+      ]
+    },
+    {
+      id: 'tourist1',
+      name: 'OHIO TOURIST',
+      type: 'tourist',
+      x: 6, y: 7,
+      dialog: [
+        'TOURIST: "Excuse me! Where is the Hocus Pocus ride? Is this Universal Studios?"',
+        'YOU: "Ma\'am, this is a real city and you\'re blocking the crosswalk."'
+      ]
+    },
+    {
+      id: 'hawthorne',
+      name: 'N. HAWTHORNE',
+      type: 'historical',
+      x: 10, y: 16,
+      dialog: [
+        'HAWTHORNE: "I worked at the Custom House to pay rent, and now they sell vampire fangs."',
+        'HAWTHORNE: "Derby Wharf still catches a wicked sea breeze at least."'
+      ]
+    },
+    {
+      id: 'cat2',
+      name: 'CHURCH ST VOID',
+      type: 'cat',
+      x: 16, y: 7,
+      dialog: [
+        'BLACK CAT: *Prrrrt.* "Tourists keep taking flash photos of me thinking I\'m a paid actor."'
+      ]
+    },
+    {
+      id: 'tourist2',
+      name: 'INFLUENCER COUPLE',
+      type: 'tourist',
+      x: 12, y: 7,
+      dialog: [
+        'COUPLE: "Babe, take one more by the Bewitched statue before the crowd walks by!"'
+      ]
+    }
+  ];
+
+  // --- WILD ENCOUNTER ROSTER ---
+  const ENCOUNTERS = [
+    {
+      id: 'lost_tourist',
+      name: 'LOST TOURIST',
+      lvl: 4,
+      maxHp: 22,
+      atk: 4,
+      sprite: 'tourist',
+      intro: 'A wild LOST TOURIST blocked the sidewalk!',
+      moves: ['ASK FOR BATHROOM', 'STOP IN CROSSWALK']
+    },
+    {
+      id: 'puritan_shade',
+      name: 'PURITAN SHADE',
+      lvl: 6,
+      maxHp: 28,
+      atk: 6,
+      sprite: 'ghost',
+      intro: 'A spectral PURITAN SHADE rose from the stones!',
+      moves: ['STERN FINGER WAG', '1692 GUILT TRIP']
+    },
+    {
+      id: 'street_busker',
+      name: 'KEYTAR DRACULA',
+      lvl: 7,
+      maxHp: 32,
+      atk: 7,
+      sprite: 'busker',
+      intro: 'KEYTAR DRACULA challenges your October vibe!',
+      moves: ['SYNTH SOLO', 'TIP JAR SHAKE']
+    },
+    {
+      id: 'harbor_phantom',
+      name: 'PRIVATEER GHOST',
+      lvl: 8,
+      maxHp: 35,
+      atk: 8,
+      sprite: 'pirate',
+      intro: 'PRIVATEER GHOST drifted off Derby Wharf!',
+      moves: ['SEA FOG', 'CANNON ECHO']
+    },
+    {
+      id: 'judge_hathorne',
+      name: 'JUDGE HATHORNE',
+      lvl: 10,
+      maxHp: 45,
+      atk: 9,
+      sprite: 'ghost',
+      intro: 'SPECTRAL MAGISTRATE appeared near Charter St!',
+      moves: ['SPECTRAL EVIDENCE', 'GAVEL SLAM']
+    },
+    {
+      id: 'alley_gremlin',
+      name: 'CIDER THIEF GULL',
+      lvl: 5,
+      maxHp: 25,
+      atk: 5,
+      sprite: 'gull',
+      intro: 'A bold SALEM SEAGULL dives for your donut!',
+      moves: ['FRENCH FRY SNATCH', 'PIERCING SQUAWK']
+    }
+  ];
+
+  // --- GAME STATE ---
+  const state = {
+    mode: 'TITLE', // TITLE, EXPLORE, DIALOG, BATTLE, MENU
+    player: {
+      x: 11,
+      y: 8,
+      dir: 'DOWN',
+      stepFrame: 0,
+      hp: 40,
+      maxHp: 40,
+      donuts: 3,
+      captured: []
+    },
+    dialogQueue: [],
+    battle: null,
+    menuIdx: 0,
+    animTick: 0
+  };
+
+  // Load saved game if available
+  try {
+    const saved = localStorage.getItem('salem_gbc_99');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed && parsed.captured) {
+        state.player.captured = parsed.captured;
       }
+    }
+  } catch (e) {}
+
+  function saveProgress() {
+    try {
+      localStorage.setItem('salem_gbc_99', JSON.stringify({
+        captured: state.player.captured
+      }));
+    } catch (e) {}
+  }
+
+  function updateHud() {
+    let zone = 'DOWNTOWN SALEM';
+    const py = state.player.y;
+    if (py >= 6 && py <= 8) zone = 'ESSEX ST MALL';
+    else if (py >= 9 && py <= 12) zone = 'OLD BURYING POINT';
+    else if (py >= 15) zone = 'DERBY WHARF';
+    else if (py <= 5) zone = 'HISTORIC DISTRICT';
+
+    document.getElementById('zoneLabel').textContent = `LOC: ${zone}`;
+    document.getElementById('logLabel').textContent = `SPIRITS: ${state.player.captured.length}/${ENCOUNTERS.length}`;
+  }
+
+  // --- DIALOG & BATTLE HELPERS ---
+  function startDialog(lines, onComplete = null) {
+    state.mode = 'DIALOG';
+    state.dialogQueue = [...lines];
+    state.dialogCallback = onComplete;
+    playSfx(520, 0.06);
+  }
+
+  function startBattle() {
+    const template = ENCOUNTERS[Math.floor(Math.random() * ENCOUNTERS.length)];
+    state.mode = 'BATTLE';
+    state.battle = {
+      enemy: { ...template, hp: template.maxHp },
+      phase: 'INTRO', // INTRO, MENU, MSG
+      cursor: 0,
+      msg: template.intro,
+      nextPhase: 'MENU'
     };
+    playSfx(220, 0.15, 'sawtooth');
+    startBgm();
+  }
 
-    function saveState() {
-      try {
-        localStorage.setItem('salem_zone', currentZone);
-        localStorage.setItem('salem_player', JSON.stringify({ x: player.x, y: player.y, dir: player.dir, hp: player.hp, maxHp: player.maxHp }));
-        localStorage.setItem('salem_inv', JSON.stringify(inventory));
-      } catch (e) {}
+  function handleBattleAction(choice) {
+    const b = state.battle;
+    const e = b.enemy;
+    playSfx(600, 0.07);
+
+    if (choice === 0) {
+      // DROP LOCAL LORE
+      const dmg = 9 + Math.floor(Math.random() * 6);
+      e.hp = Math.max(0, e.hp - dmg);
+      b.msg = `You dropped actual 1692 history! ${e.name} lost ${dmg} EGO!`;
+      b.phase = 'MSG';
+      if (e.hp <= 0) {
+        b.nextPhase = 'WIN';
+      } else {
+        b.nextPhase = 'ENEMY_TURN';
+      }
+    } else if (choice === 1) {
+      // CAPTURE IN SPIRIT LOG
+      const ratio = e.hp / e.maxHp;
+      const chance = ratio < 0.5 ? 0.85 : 0.4;
+      if (Math.random() < chance) {
+        if (!state.player.captured.includes(e.id)) {
+          state.player.captured.push(e.id);
+          saveProgress();
+          updateHud();
+        }
+        playSfx(880, 0.2);
+        b.msg = `Gotcha! ${e.name} was logged in your SALEM FIELD GUIDE!`;
+        b.phase = 'MSG';
+        b.nextPhase = 'END';
+      } else {
+        b.msg = `Too stubborn! Lower their EGO with LORE first!`;
+        b.phase = 'MSG';
+        b.nextPhase = 'ENEMY_TURN';
+      }
+    } else if (choice === 2) {
+      // CIDER DONUT HEAL
+      if (state.player.donuts > 0) {
+        state.player.donuts--;
+        state.player.hp = Math.min(state.player.maxHp, state.player.hp + 20);
+        playSfx(740, 0.12);
+        b.msg = `Ate a warm Cider Donut! Restored 20 SANITY! (${state.player.donuts} left)`;
+        b.phase = 'MSG';
+        b.nextPhase = 'ENEMY_TURN';
+      } else {
+        b.msg = `Out of Cider Donuts! Go pet BEANS on Essex St to heal!`;
+        b.phase = 'MSG';
+        b.nextPhase = 'MENU';
+      }
+    } else if (choice === 3) {
+      // DUCK INTO ALLEYS (RUN)
+      playSfx(300, 0.1);
+      b.msg = `Ducked down Derby Square alley and lost them!`;
+      b.phase = 'MSG';
+      b.nextPhase = 'END';
+    }
+  }
+
+  function enemyTurn() {
+    const b = state.battle;
+    const e = b.enemy;
+    const move = e.moves[Math.floor(Math.random() * e.moves.length)];
+    const dmg = Math.max(2, e.atk - 2 + Math.floor(Math.random() * 4));
+    state.player.hp = Math.max(1, state.player.hp - dmg);
+    playSfx(180, 0.12, 'sawtooth');
+    b.msg = `${e.name} used ${move}! You lost ${dmg} SANITY!`;
+    b.phase = 'MSG';
+    b.nextPhase = 'MENU';
+  }
+
+  // --- INPUT CONTROLLER ---
+  function onInput(key) {
+    vibrate(15);
+
+    if (key === 'SELECT') {
+      toggleSound();
+      return;
     }
 
-    function startBattle(enemy) {
-      mode = 'BATTLE';
-      currentEnemy = { ...enemy };
-      battleMenuIdx = 0;
-      message = `Encounter: ${currentEnemy.name}!`;
-      playBeep(220, 'sawtooth', 0.2);
-      render();
+    if (state.mode === 'TITLE') {
+      if (key === 'A' || key === 'START') {
+        state.mode = 'EXPLORE';
+        playSfx(587.33, 0.1);
+        updateHud();
+      }
+      return;
     }
 
-    function drawMap() {
-      const grid = maps[currentZone];
-      for (let r = 0; r < 7; r++) {
-        for (let c = 0; c < 10; c++) {
-          const t = grid[r][c];
-          const px = c * 16;
-          const py = r * 16;
+    if (state.mode === 'DIALOG') {
+      if (key === 'A' || key === 'B') {
+        state.dialogQueue.shift();
+        playSfx(520, 0.05);
+        if (state.dialogQueue.length === 0) {
+          state.mode = 'EXPLORE';
+          if (state.dialogCallback) state.dialogCallback();
+        }
+      }
+      return;
+    }
 
-          if (t === 0) { // Cobble
-            ctx.fillStyle = C.L0;
-            ctx.fillRect(px, py, 16, 16);
-            ctx.fillStyle = C.L1;
-            ctx.fillRect(px + 1, py + 1, 6, 6);
-            ctx.fillRect(px + 9, py + 9, 6, 6);
-          } else if (t === 1) { // Grass
-            ctx.fillStyle = C.L1;
-            ctx.fillRect(px, py, 16, 16);
-            ctx.fillStyle = C.L2;
-            ctx.fillRect(px + 4, py + 4, 2, 4);
-            ctx.fillRect(px + 10, py + 8, 2, 3);
-          } else if (t === 2) { // Water
-            ctx.fillStyle = C.L3;
-            ctx.fillRect(px, py, 16, 16);
-            ctx.fillStyle = C.L2;
-            ctx.fillRect(px + 2, py + (player.step % 2 ? 4 : 6), 12, 2);
-          } else if (t === 3) { // Brick / Building
-            ctx.fillStyle = C.L3;
-            ctx.fillRect(px, py, 16, 16);
-            ctx.fillStyle = C.L2;
-            ctx.fillRect(px + 2, py + 2, 12, 12);
-            ctx.fillStyle = C.L0;
-            ctx.fillRect(px + 5, py + 4, 6, 4);
-          } else if (t === 4) { // Gravestone
-            ctx.fillStyle = C.L1;
-            ctx.fillRect(px, py, 16, 16);
-            ctx.fillStyle = C.L3;
-            ctx.fillRect(px + 4, py + 4, 8, 10);
-            ctx.fillStyle = C.L2;
-            ctx.fillRect(px + 5, py + 5, 6, 8);
-          } else if (t === 5) { // Tree
-            ctx.fillStyle = C.L1;
-            ctx.fillRect(px, py, 16, 16);
-            ctx.fillStyle = C.L3;
-            ctx.fillRect(px + 3, py + 2, 10, 8);
-            ctx.fillRect(px + 7, py + 10, 2, 5);
-          } else if (t === 6) { // Pier Plank
-            ctx.fillStyle = C.L1;
-            ctx.fillRect(px, py, 16, 16);
-            ctx.fillStyle = C.L2;
-            ctx.fillRect(px, py + 15, 16, 1);
-            ctx.fillRect(px + 3, py + 4, 10, 1);
+    if (state.mode === 'MENU') {
+      if (key === 'B' || key === 'START') {
+        state.mode = 'EXPLORE';
+        playSfx(400, 0.05);
+      }
+      return;
+    }
+
+    if (state.mode === 'BATTLE') {
+      const b = state.battle;
+      if (b.phase === 'INTRO' || b.phase === 'MSG') {
+        if (key === 'A' || key === 'B') {
+          if (b.nextPhase === 'MENU') {
+            b.phase = 'MENU';
+          } else if (b.nextPhase === 'ENEMY_TURN') {
+            enemyTurn();
+          } else if (b.nextPhase === 'WIN') {
+            if (!state.player.captured.includes(b.enemy.id)) {
+              state.player.captured.push(b.enemy.id);
+              saveProgress();
+              updateHud();
+            }
+            b.msg = `${b.enemy.name} cleared the sidewalk! Logged in Field Guide!`;
+            b.nextPhase = 'END';
+          } else if (b.nextPhase === 'END') {
+            state.mode = 'EXPLORE';
+            state.battle = null;
+            startBgm();
           }
         }
+      } else if (b.phase === 'MENU') {
+        if (key === 'LEFT' && b.cursor % 2 === 1) b.cursor--;
+        if (key === 'RIGHT' && b.cursor % 2 === 0) b.cursor++;
+        if (key === 'UP' && b.cursor >= 2) b.cursor -= 2;
+        if (key === 'DOWN' && b.cursor < 2) b.cursor += 2;
+        if (key === 'A') handleBattleAction(b.cursor);
       }
+      return;
     }
 
-    function drawEntities() {
-      const zoneNpcs = npcs[currentZone] || {};
-      for (const [pos, npc] of Object.entries(zoneNpcs)) {
-        const [nx, ny] = pos.split(',').map(Number);
-        const ex = nx * 16;
-        const ey = ny * 16;
-
-        if (npc.sprite === 'ghost') {
-          ctx.fillStyle = C.L0;
-          ctx.fillRect(ex + 4, ey + 2, 8, 10);
-          ctx.fillStyle = C.L3;
-          ctx.fillRect(ex + 6, ey + 4, 2, 2);
-          ctx.fillRect(ex + 9, ey + 4, 2, 2);
-        } else if (npc.sprite === 'cat') {
-          ctx.fillStyle = C.L3;
-          ctx.fillRect(ex + 4, ey + 6, 8, 6);
-          ctx.fillRect(ex + 3, ey + 4, 4, 4);
-          ctx.fillStyle = C.L0;
-          ctx.fillRect(ex + 4, ey + 5, 1, 1);
-        } else if (npc.sprite === 'witch') {
-          ctx.fillStyle = C.L3;
-          ctx.fillRect(ex + 3, ey + 2, 10, 3);
-          ctx.fillRect(ex + 6, ey + 0, 4, 4);
-          ctx.fillStyle = C.L2;
-          ctx.fillRect(ex + 4, ey + 5, 8, 9);
-        }
+    if (state.mode === 'EXPLORE') {
+      if (key === 'START') {
+        state.mode = 'MENU';
+        playSfx(620, 0.07);
+        return;
       }
 
-      // Player Sprite
-      const px = player.x * 16;
-      const py = player.y * 16;
-
-      ctx.fillStyle = C.L3;
-      if (player.dir === 'left') {
-        ctx.fillRect(px + 2, py + 2, 6, 2);
-      } else if (player.dir === 'right') {
-        ctx.fillRect(px + 8, py + 2, 6, 2);
-      } else {
-        ctx.fillRect(px + 4, py + 2, 8, 2);
+      if (key === 'A') {
+        interactFront();
+        return;
       }
 
-      ctx.fillStyle = C.L0;
-      ctx.fillRect(px + 5, py + 3, 6, 4);
+      let dx = 0, dy = 0;
+      if (key === 'UP') { dy = -1; state.player.dir = 'UP'; }
+      if (key === 'DOWN') { dy = 1; state.player.dir = 'DOWN'; }
+      if (key === 'LEFT') { dx = -1; state.player.dir = 'LEFT'; }
+      if (key === 'RIGHT') { dx = 1; state.player.dir = 'RIGHT'; }
 
-      ctx.fillStyle = C.L3;
-      ctx.fillRect(px + 4, py + 7, 8, 5);
+      if (dx !== 0 || dy !== 0) {
+        const nx = state.player.x + dx;
+        const ny = state.player.y + dy;
+        if (canWalk(nx, ny)) {
+          state.player.x = nx;
+          state.player.y = ny;
+          state.player.stepFrame = (state.player.stepFrame + 1) % 2;
+          playSfx(140, 0.02, 'triangle');
+          updateHud();
 
-      ctx.fillStyle = C.L2;
-      if (player.step % 2 === 0) {
-        ctx.fillRect(px + 4, py + 12, 3, 3);
-        ctx.fillRect(px + 9, py + 12, 3, 3);
-      } else {
-        ctx.fillRect(px + 5, py + 12, 2, 3);
-        ctx.fillRect(px + 8, py + 12, 2, 3);
-      }
-    }
-
-    function drawDialogue() {
-      ctx.fillStyle = C.L3;
-      ctx.fillRect(0, 112, 160, 32);
-      ctx.fillStyle = C.L0;
-      ctx.fillRect(2, 114, 156, 28);
-      ctx.fillStyle = C.L3;
-      ctx.font = '8px monospace';
-
-      ctx.fillText(message.slice(0, 24), 6, 125);
-      if (message.length > 24) {
-        ctx.fillText(message.slice(24, 48), 6, 136);
-      }
-    }
-
-    function drawBattleScreen() {
-      ctx.fillStyle = C.L0;
-      ctx.fillRect(0, 0, 160, 144);
-
-      ctx.fillStyle = C.L3;
-      ctx.font = '8px monospace';
-      ctx.fillText(currentEnemy.name.toUpperCase(), 10, 14);
-      ctx.fillText(`AGRO: ${currentEnemy.hp}/${currentEnemy.maxHp}`, 10, 24);
-      ctx.strokeRect(10, 26, 60, 4);
-      ctx.fillRect(10, 26, (currentEnemy.hp / currentEnemy.maxHp) * 60, 4);
-
-      ctx.fillStyle = C.L2;
-      ctx.fillRect(95, 10, 50, 40);
-      ctx.fillStyle = C.L0;
-      ctx.font = '9px monospace';
-      ctx.fillText(currentEnemy.sprite.toUpperCase(), 102, 34);
-
-      ctx.fillStyle = C.L3;
-      ctx.fillRect(16, 60, 44, 44);
-      ctx.fillStyle = C.L0;
-      ctx.fillText("YOU", 28, 85);
-
-      ctx.fillStyle = C.L3;
-      ctx.fillText("INVESTIGATOR", 80, 75);
-      ctx.fillText(`HP: ${player.hp}/${player.maxHp}`, 80, 85);
-      ctx.strokeRect(80, 88, 60, 4);
-      ctx.fillRect(80, 88, (player.hp / player.maxHp) * 60, 4);
-
-      ctx.fillStyle = C.L3;
-      ctx.fillRect(0, 106, 160, 38);
-      ctx.fillStyle = C.L0;
-      ctx.fillRect(2, 108, 156, 34);
-
-      ctx.fillStyle = C.L3;
-      ctx.font = '8px monospace';
-
-      const options = ["TALK", "WARD", "ITEM", "RUN"];
-      options.forEach((opt, idx) => {
-        const ox = (idx % 2 === 0) ? 18 : 88;
-        const oy = (idx < 2) ? 120 : 134;
-        if (battleMenuIdx === idx) {
-          ctx.fillText("▶ " + opt, ox - 10, oy);
+          // Check tall leaves / graveyard grass for encounters
+          const tile = WORLD_MAP[ny][nx];
+          if (tile === 5 && Math.random() < 0.24) {
+            startBattle();
+          }
         } else {
-          ctx.fillText(opt, ox, oy);
+          playSfx(95, 0.04, 'sawtooth');
         }
+      }
+    }
+  }
+
+  function canWalk(x, y) {
+    if (x < 0 || x >= MAP_W || y < 0 || y >= MAP_H) return false;
+    const t = WORLD_MAP[y][x];
+    // Walkable tiles: 0 (pavement), 1 (Essex brick), 5 (leaves/grass), 7 (Derby Wharf wood)
+    if (![0, 1, 5, 7].includes(t)) return false;
+    // Check NPC collision
+    for (const npc of NPCS) {
+      if (npc.x === x && npc.y === y) return false;
+    }
+    return true;
+  }
+
+  function interactFront() {
+    let tx = state.player.x;
+    let ty = state.player.y;
+    if (state.player.dir === 'UP') ty--;
+    if (state.player.dir === 'DOWN') ty++;
+    if (state.player.dir === 'LEFT') tx--;
+    if (state.player.dir === 'RIGHT') tx++;
+
+    // Check NPC
+    const npc = NPCS.find(n => n.x === tx && n.y === ty);
+    if (npc) {
+      if (npc.heal) {
+        state.player.hp = state.player.maxHp;
+        state.player.donuts = 3;
+      }
+      startDialog(npc.dialog);
+      return;
+    }
+
+    // Check Landmarks & Shop Signs
+    const signKey = `${tx},${ty}`;
+    if (SIGNS[signKey]) {
+      startDialog([SIGNS[signKey]]);
+      return;
+    }
+
+    // Generic Gravestones
+    if (WORLD_MAP[ty] && WORLD_MAP[ty][tx] === 8) {
+      startDialog(['OLD CHARTER ST TOMBSTONE: Carved with a winged skull and 1688 inscription.']);
+    }
+  }
+
+  // --- PIXEL ART RENDERING (160x144 Native GBC) ---
+  function drawTile(tx, ty, sx, sy) {
+    const t = WORLD_MAP[ty][tx];
+    // Base ground fill
+    ctx.fillStyle = PAL.PAVE;
+    ctx.fillRect(sx, sy, 16, 16);
+
+    if (t === 0) {
+      // Cobblestone sidewalk
+      ctx.fillStyle = PAL.PAVE_DARK;
+      ctx.fillRect(sx + 3, sy + 3, 2, 2);
+      ctx.fillRect(sx + 11, sy + 10, 2, 2);
+    } else if (t === 1) {
+      // Essex St Red Brick Pedestrian Mall
+      ctx.fillStyle = PAL.BRICK;
+      ctx.fillRect(sx, sy, 16, 16);
+      ctx.fillStyle = PAL.BRICK_HI;
+      ctx.fillRect(sx + 1, sy + 1, 6, 3);
+      ctx.fillRect(sx + 9, sy + 5, 6, 3);
+      ctx.fillRect(sx + 2, sy + 9, 6, 3);
+      ctx.fillRect(sx + 8, sy + 13, 6, 2);
+    } else if (t === 2) {
+      // Colonial Clapboard Wall + Window
+      ctx.fillStyle = PAL.WALL_TAN;
+      ctx.fillRect(sx, sy, 16, 16);
+      ctx.fillStyle = PAL.INK;
+      ctx.fillRect(sx, sy + 14, 16, 2);
+      ctx.fillRect(sx + 4, sy + 4, 8, 8);
+      ctx.fillStyle = PAL.GOLD;
+      ctx.fillRect(sx + 5, sy + 5, 6, 6);
+    } else if (t === 3) {
+      // Gabled Salem Roof
+      ctx.fillStyle = PAL.ROOF_PURP;
+      ctx.fillRect(sx, sy, 16, 16);
+      ctx.fillStyle = PAL.INK;
+      ctx.fillRect(sx, sy + 7, 16, 1);
+      ctx.fillRect(sx, sy + 15, 16, 1);
+    } else if (t === 4) {
+      // Autumn Tree (Orange/Gold Foliage)
+      ctx.fillStyle = PAL.INK;
+      ctx.fillRect(sx + 6, sy + 11, 4, 5);
+      ctx.fillStyle = PAL.LEAF_ORG;
+      ctx.fillRect(sx + 2, sy + 2, 12, 10);
+      ctx.fillStyle = PAL.LEAF_YEL;
+      ctx.fillRect(sx + 4, sy + 3, 6, 5);
+    } else if (t === 5) {
+      // Haunted Graveyard Grass + Crunchy Autumn Leaves
+      ctx.fillStyle = PAL.GRASS;
+      ctx.fillRect(sx, sy, 16, 16);
+      ctx.fillStyle = PAL.LEAF_ORG;
+      ctx.fillRect(sx + 2, sy + 3, 3, 3);
+      ctx.fillRect(sx + 10, sy + 9, 4, 3);
+      ctx.fillStyle = PAL.LEAF_YEL;
+      ctx.fillRect(sx + 6, sy + 12, 3, 2);
+    } else if (t === 6) {
+      // Salem Harbor Water
+      ctx.fillStyle = PAL.WATER;
+      ctx.fillRect(sx, sy, 16, 16);
+      const waveShift = (Math.floor(state.animTick / 20) + tx) % 2 === 0 ? 2 : 0;
+      ctx.fillStyle = PAL.WATER_HI;
+      ctx.fillRect(sx + 2 + waveShift, sy + 5, 6, 2);
+      ctx.fillRect(sx + 7 - waveShift, sy + 12, 5, 2);
+    } else if (t === 7) {
+      // Derby Wharf Planks
+      ctx.fillStyle = PAL.WOOD;
+      ctx.fillRect(sx, sy, 16, 16);
+      ctx.fillStyle = PAL.WOOD_HI;
+      ctx.fillRect(sx + 1, sy + 1, 14, 3);
+      ctx.fillRect(sx + 1, sy + 6, 14, 3);
+      ctx.fillRect(sx + 1, sy + 11, 14, 3);
+    } else if (t === 8) {
+      // Gravestone or Bewitched Statue
+      ctx.fillStyle = (ty === 6) ? PAL.BRICK : PAL.GRASS;
+      ctx.fillRect(sx, sy, 16, 16);
+      ctx.fillStyle = (ty === 6) ? PAL.GOLD : PAL.STONE;
+      ctx.fillRect(sx + 3, sy + 2, 10, 12);
+      ctx.fillStyle = PAL.INK;
+      ctx.fillRect(sx + 5, sy + 5, 6, 2);
+    } else if (t === 9) {
+      // Shop Door with Hanging Sign
+      ctx.fillStyle = PAL.WALL_TAN;
+      ctx.fillRect(sx, sy, 16, 16);
+      ctx.fillStyle = PAL.BRICK;
+      ctx.fillRect(sx + 4, sy + 3, 8, 13);
+      ctx.fillStyle = PAL.GOLD;
+      ctx.fillRect(sx + 9, sy + 9, 2, 2);
+    }
+  }
+
+  function drawSprite(sx, sy, type, step = 0) {
+    if (type === 'player') {
+      // Black techwear/punk coat + dark hair
+      ctx.fillStyle = PAL.INK;
+      ctx.fillRect(sx + 3, sy + 1, 10, 14);
+      // Face
+      ctx.fillStyle = PAL.BG_CREAM;
+      ctx.fillRect(sx + 5, sy + 4, 6, 4);
+      // Eyes
+      ctx.fillStyle = PAL.INK;
+      ctx.fillRect(sx + 5, sy + 5, 2, 2);
+      ctx.fillRect(sx + 9, sy + 5, 2, 2);
+      // Crimson scarf / collar accent
+      ctx.fillStyle = PAL.BRICK_HI;
+      ctx.fillRect(sx + 4, sy + 8, 8, 2);
+      // Boots step animation
+      ctx.fillStyle = PAL.STONE;
+      ctx.fillRect(sx + 4, sy + 14 + (step ? -1 : 0), 3, 2);
+      ctx.fillRect(sx + 9, sy + 14 + (step ? 0 : -1), 3, 2);
+    } else if (type === 'cat') {
+      // Tortoiseshell Cat (Beans)
+      ctx.fillStyle = PAL.INK;
+      ctx.fillRect(sx + 4, sy + 6, 8, 8);
+      // Ears
+      ctx.fillRect(sx + 4, sy + 4, 2, 2);
+      ctx.fillRect(sx + 10, sy + 4, 2, 2);
+      // Tortie Orange/Gold patches
+      ctx.fillStyle = PAL.TORTIE_ORG;
+      ctx.fillRect(sx + 5, sy + 6, 3, 3);
+      ctx.fillRect(sx + 8, sy + 10, 3, 3);
+      // Glowing Gold Eyes
+      ctx.fillStyle = PAL.GOLD;
+      ctx.fillRect(sx + 5, sy + 8, 2, 2);
+      ctx.fillRect(sx + 9, sy + 8, 2, 2);
+    } else if (type === 'ghost') {
+      // Spectral Puritan / Giles Corey
+      ctx.fillStyle = PAL.GHOST_CYAN;
+      ctx.fillRect(sx + 3, sy + 2, 10, 12);
+      ctx.fillStyle = PAL.INK;
+      ctx.fillRect(sx + 5, sy + 5, 2, 3);
+      ctx.fillRect(sx + 9, sy + 5, 2, 3);
+    } else {
+      // Tourist in pointy witch hat
+      ctx.fillStyle = PAL.INK;
+      ctx.fillRect(sx + 2, sy + 3, 12, 2); // Hat brim
+      ctx.fillRect(sx + 5, sy + 0, 6, 3);  // Hat cone
+      ctx.fillStyle = PAL.BG_CREAM;
+      ctx.fillRect(sx + 5, sy + 5, 6, 4);
+      ctx.fillStyle = PAL.LEAF_ORG;
+      ctx.fillRect(sx + 4, sy + 9, 8, 6);
+    }
+  }
+
+  function renderExplore() {
+    // Camera centered on player (10x9 visible tiles on 160x144 screen)
+    const camX = state.player.x - 4;
+    const camY = state.player.y - 4;
+
+    for (let gy = 0; gy < 9; gy++) {
+      for (let gx = 0; gx < 10; gx++) {
+        const mx = camX + gx;
+        const my = camY + gy;
+        const sx = gx * 16;
+        const sy = gy * 16;
+        if (mx >= 0 && mx < MAP_W && my >= 0 && my < MAP_H) {
+          drawTile(mx, my, sx, sy);
+        } else {
+          ctx.fillStyle = PAL.INK;
+          ctx.fillRect(sx, sy, 16, 16);
+        }
+      }
+    }
+
+    // Draw NPCs in view
+    for (const npc of NPCS) {
+      const gx = npc.x - camX;
+      const gy = npc.y - camY;
+      if (gx >= 0 && gx < 10 && gy >= 0 && gy < 9) {
+        drawSprite(gx * 16, gy * 16, npc.type);
+      }
+    }
+
+    // Draw Player at center tile (4,4)
+    drawSprite(4 * 16, 4 * 16, 'player', state.player.stepFrame);
+
+    // Draw Dialog Overlay if active
+    if (state.mode === 'DIALOG' && state.dialogQueue.length > 0) {
+      drawTextBox(state.dialogQueue[0]);
+    }
+
+    // Draw Start Menu Overlay if active
+    if (state.mode === 'MENU') {
+      ctx.fillStyle = PAL.BG_CREAM;
+      ctx.fillRect(16, 12, 128, 118);
+      ctx.strokeStyle = PAL.INK;
+      ctx.lineWidth = 2;
+      ctx.strokeRect(18, 14, 124, 114);
+
+      ctx.fillStyle = PAL.INK;
+      ctx.font = 'bold 9px monospace';
+      ctx.fillText('SALEM FIELD GUIDE', 26, 28);
+      ctx.fillText(`SANITY: ${state.player.hp}/${state.player.maxHp}`, 26, 42);
+      ctx.fillText(`CIDER DONUTS: ${state.player.donuts}`, 26, 54);
+      ctx.fillText('LOGGED SPIRITS:', 26, 70);
+
+      ENCOUNTERS.forEach((enc, i) => {
+        const caught = state.player.captured.includes(enc.id);
+        ctx.fillText(`${caught ? '★' : '·'} ${caught ? enc.name : '???????'}`, 28, 82 + i * 8);
       });
     }
+  }
 
-    function render() {
-      if (mode === 'EXPLORE') {
-        ctx.fillStyle = C.L0;
-        ctx.fillRect(0, 0, 160, 144);
-        drawMap();
-        drawEntities();
-        drawDialogue();
-      } else if (mode === 'BATTLE') {
-        drawBattleScreen();
-      }
-    }
+  function drawTextBox(text) {
+    ctx.fillStyle = PAL.BG_CREAM;
+    ctx.fillRect(4, 96, 152, 44);
+    ctx.strokeStyle = PAL.INK;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(6, 98, 148, 40);
 
-    function move(dx, dy, dirName) {
-      if (mode === 'BATTLE') {
-        if (dx !== 0) battleMenuIdx = (battleMenuIdx % 2 === 0) ? battleMenuIdx + 1 : battleMenuIdx - 1;
-        if (dy !== 0) battleMenuIdx = (battleMenuIdx < 2) ? battleMenuIdx + 2 : battleMenuIdx - 2;
-        battleMenuIdx = Math.max(0, Math.min(3, battleMenuIdx));
-        playBeep(120, 'triangle', 0.03);
-        render();
-        return;
-      }
+    ctx.fillStyle = PAL.INK;
+    ctx.font = 'bold 8px monospace';
 
-      player.dir = dirName;
-      player.step++;
-      playBeep(100, 'triangle', 0.03);
-
-      const nx = player.x + dx;
-      const ny = player.y + dy;
-
-      // Screen transition between zones
-      if (ny >= 7 && currentZone === 'downtown') {
-        currentZone = 'waterfront';
-        player.y = 0;
-        message = "Arrived at Derby Wharf!";
-        hud.textContent = "DERBY WHARF WATERFRONT";
-        saveState();
-        render();
-        return;
-      } else if (ny < 0 && currentZone === 'waterfront') {
-        currentZone = 'downtown';
-        player.y = 6;
-        message = "Returned to Essex Street!";
-        hud.textContent = "ESSEX ST MALL";
-        saveState();
-        render();
-        return;
-      }
-
-      if (nx >= 0 && nx < 10 && ny >= 0 && ny < 7) {
-        const targetTile = maps[currentZone][ny][nx];
-        if (targetTile !== 3 && targetTile !== 5 && targetTile !== 2) {
-          player.x = nx;
-          player.y = ny;
-        }
-      }
-
-      if (currentZone === 'downtown') {
-        if (player.x < 3 && player.y > 2) {
-          hud.textContent = "HOWARD ST CEMETERY";
-        } else if (player.x > 3 && player.y < 3) {
-          hud.textContent = "SALEM COMMON";
-        } else {
-          hud.textContent = "ESSEX ST MALL";
-        }
+    // Word wrap at ~22 chars
+    const words = text.split(' ');
+    let line = '';
+    let y = 110;
+    for (let w of words) {
+      if ((line + w).length > 22) {
+        ctx.fillText(line.trim(), 12, y);
+        line = w + ' ';
+        y += 10;
       } else {
-        hud.textContent = (player.y >= 5) ? "DERBY LIGHTHOUSE" : "DERBY WHARF";
+        line += w + ' ';
       }
-
-      saveState();
-
-      const zoneNpcs = npcs[currentZone] || {};
-      const key = `${player.x},${player.y}`;
-      if (zoneNpcs[key]) {
-        message = zoneNpcs[key].text;
-      } else {
-        message = `Roaming ${hud.textContent}...`;
-      }
-
-      render();
     }
+    if (line) ctx.fillText(line.trim(), 12, y);
+  }
 
-    function handleA() {
-      playBeep(440, 'square', 0.06);
-      if (mode === 'EXPLORE') {
-        let tx = player.x;
-        let ty = player.y;
-        if (player.dir === 'up') ty--;
-        if (player.dir === 'down') ty++;
-        if (player.dir === 'left') tx--;
-        if (player.dir === 'right') tx++;
+  function renderBattle() {
+    const b = state.battle;
+    const e = b.enemy;
 
-        const zoneNpcs = npcs[currentZone] || {};
-        const targetKey = `${tx},${ty}`;
-        if (zoneNpcs[targetKey]) {
-          startBattle(zoneNpcs[targetKey]);
-          return;
-        } else {
-          message = "Inspected: Historic cobblestone.";
-        }
-      } else if (mode === 'BATTLE') {
-        if (battleMenuIdx === 0) { // TALK
-          message = `${currentEnemy.name} calmed down.`;
-          currentEnemy.hp = Math.max(0, currentEnemy.hp - 10);
-        } else if (battleMenuIdx === 1) { // WARD
-          playBeep(280, 'sine', 0.1);
-          message = `Brandished Cold Iron! Peace fell.`;
-          currentEnemy.hp = Math.max(0, currentEnemy.hp - 15);
-        } else if (battleMenuIdx === 2) { // ITEM
-          if (inventory.length > 0) {
-            const used = inventory.shift();
-            message = `Offered ${used}! Spirit smiles.`;
-            player.hp = Math.min(player.maxHp, player.hp + 10);
-            currentEnemy.hp = 0;
-            saveState();
-          } else {
-            message = "Pack empty of soothing items!";
-          }
-        } else if (battleMenuIdx === 3) { // RUN
-          message = "Fled the encounter.";
-          mode = 'EXPLORE';
-          render();
-          return;
-        }
+    ctx.fillStyle = PAL.BG_CREAM;
+    ctx.fillRect(0, 0, 160, 144);
 
-        if (currentEnemy.hp <= 0) {
-          playBeep(587, 'sine', 0.15);
-          if (currentEnemy.reward && !inventory.includes(currentEnemy.reward)) {
-            inventory.push(currentEnemy.reward);
-            saveState();
-          }
-          setTimeout(() => {
-            message = `${currentEnemy.name} is peaceful! Got loot.`;
-            mode = 'EXPLORE';
-            render();
-          }, 800);
-        }
-      }
-      render();
-    }
+    // Enemy Status Box (Top Left)
+    ctx.fillStyle = PAL.INK;
+    ctx.font = 'bold 8px monospace';
+    ctx.fillText(`${e.name} :L${e.lvl}`, 8, 14);
+    // HP Bar
+    ctx.fillRect(8, 18, 66, 6);
+    const eRatio = Math.max(0, e.hp / e.maxHp);
+    ctx.fillStyle = eRatio > 0.3 ? PAL.HP_GREEN : PAL.HP_RED;
+    ctx.fillRect(9, 19, Math.floor(64 * eRatio), 4);
 
-    function handleB() {
-      playBeep(330, 'square', 0.05);
-      if (mode === 'BATTLE') {
-        mode = 'EXPLORE';
-        message = "Broke off the communion.";
-      } else {
-        message = `Pack: ${inventory.join(', ') || 'Empty'}`;
-      }
-      render();
-    }
+    // Enemy Big Sprite (Top Right)
+    const ex = 108, ey = 14;
+    ctx.fillStyle = e.sprite === 'ghost' ? PAL.GHOST_CYAN : PAL.LEAF_ORG;
+    ctx.fillRect(ex, ey, 32, 32);
+    ctx.strokeStyle = PAL.INK;
+    ctx.strokeRect(ex, ey, 32, 32);
+    ctx.fillStyle = PAL.INK;
+    ctx.fillRect(ex + 6, ey + 10, 6, 6);
+    ctx.fillRect(ex + 20, ey + 10, 6, 6);
+    ctx.fillRect(ex + 8, ey + 22, 16, 4);
 
-    const bind = (id, fn) => {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        fn();
+    // Player Back Sprite (Bottom Left)
+    ctx.fillStyle = PAL.INK;
+    ctx.fillRect(14, 58, 28, 28);
+    ctx.fillStyle = PAL.BRICK_HI;
+    ctx.fillRect(16, 72, 24, 6);
+
+    // Player Status Box (Middle Right)
+    ctx.fillStyle = PAL.INK;
+    ctx.fillText(`LOCAL (YOU)`, 78, 66);
+    ctx.fillText(`SANITY: ${state.player.hp}/${state.player.maxHp}`, 78, 78);
+    ctx.fillRect(78, 82, 66, 6);
+    const pRatio = Math.max(0, state.player.hp / state.player.maxHp);
+    ctx.fillStyle = pRatio > 0.3 ? PAL.HP_GREEN : PAL.HP_RED;
+    ctx.fillRect(79, 83, Math.floor(64 * pRatio), 4);
+
+    // Bottom Battle Box
+    if (b.phase === 'MENU') {
+      ctx.fillStyle = PAL.BG_CREAM;
+      ctx.fillRect(4, 96, 152, 44);
+      ctx.strokeStyle = PAL.INK;
+      ctx.strokeRect(6, 98, 148, 40);
+
+      const opts = ['LORE DROP', 'SPIRIT LOG', 'DONUT', 'ALLEYS'];
+      ctx.fillStyle = PAL.INK;
+      opts.forEach((opt, idx) => {
+        const ox = (idx % 2 === 0) ? 16 : 88;
+        const oy = (idx < 2) ? 114 : 128;
+        ctx.fillText(`${b.cursor === idx ? '▶' : ' '} ${opt}`, ox, oy);
       });
+    } else {
+      drawTextBox(b.msg);
+    }
+  }
+
+  function renderTitle() {
+    ctx.fillStyle = PAL.INK;
+    ctx.fillRect(0, 0, 160, 144);
+
+    // Autumn Moon
+    ctx.fillStyle = PAL.LEAF_YEL;
+    ctx.beginPath();
+    ctx.arc(80, 46, 24, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Witch House Silhouette
+    ctx.fillStyle = PAL.ROOF_PURP;
+    ctx.fillRect(46, 48, 68, 32);
+
+    ctx.fillStyle = PAL.BG_CREAM;
+    ctx.font = 'bold 12px monospace';
+    ctx.fillText('SALEM 1999', 42, 24);
+
+    ctx.fillStyle = PAL.GHOST_CYAN;
+    ctx.font = 'bold 8px monospace';
+    ctx.fillText('POCKET WITCH CITY RPG', 26, 94);
+
+    ctx.fillStyle = PAL.LEAF_ORG;
+    ctx.fillText('ESSEX ST · DERBY WHARF', 24, 108);
+
+    if (Math.floor(state.animTick / 25) % 2 === 0) {
+      ctx.fillStyle = PAL.GOLD;
+      ctx.fillText('PRESS [A] OR START', 34, 130);
+    }
+  }
+
+  // --- MAIN RENDER LOOP ---
+  function loop() {
+    state.animTick++;
+    if (state.mode === 'TITLE') {
+      renderTitle();
+    } else if (state.mode === 'BATTLE') {
+      renderBattle();
+    } else {
+      renderExplore();
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+
+  // --- BIND TOUCH & KEYBOARD CONTROLS ---
+  document.querySelectorAll('[data-key]').forEach(btn => {
+    const key = btn.getAttribute('data-key');
+    const trigger = (e) => {
+      e.preventDefault();
+      btn.classList.add('pressed');
+      onInput(key);
     };
+    const release = (e) => {
+      e.preventDefault();
+      btn.classList.remove('pressed');
+    };
+    btn.addEventListener('touchstart', trigger, { passive: false });
+    btn.addEventListener('touchend', release, { passive: false });
+    btn.addEventListener('mousedown', trigger);
+    btn.addEventListener('mouseup', release);
+    btn.addEventListener('mouseleave', release);
+  });
 
-    bind('btn-up', () => move(0, -1, 'up'));
-    bind('btn-down', () => move(0, 1, 'down'));
-    bind('btn-left', () => move(-1, 0, 'left'));
-    bind('btn-right', () => move(1, 0, 'right'));
-    bind('btn-a', handleA);
-    bind('btn-b', handleB);
-
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowUp' || e.key === 'w') move(0, -1, 'up');
-      if (e.key === 'ArrowDown' || e.key === 's') move(0, 1, 'down');
-      if (e.key === 'ArrowLeft' || e.key === 'a') move(-1, 0, 'left');
-      if (e.key === 'ArrowRight' || e.key === 'd') move(1, 0, 'right');
-      if (e.key === 'z') handleA();
-      if (e.key === 'x') handleB();
-    });
-
-    // Forced immediate draw on boot
-    render();
-  </script>
+  window.addEventListener('keydown', (e) => {
+    const map = {
+      ArrowUp: 'UP', KeyW: 'UP',
+      ArrowDown: 'DOWN', KeyS: 'DOWN',
+      ArrowLeft: 'LEFT', KeyA: 'LEFT',
+      ArrowRight: 'RIGHT', KeyD: 'RIGHT',
+      KeyZ: 'A', Enter: 'A', Space: 'A',
+      KeyX: 'B', Backspace: 'B',
+      ShiftLeft: 'SELECT', ShiftRight: 'SELECT',
+      KeyM: 'START'
+    };
+    if (map[e.code]) {
+      e.preventDefault();
+      onInput(map[e.code]);
+    }
+  });
+})();
+</script>
 </body>
 </html>
-
